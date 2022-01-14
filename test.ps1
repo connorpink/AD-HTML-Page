@@ -1,10 +1,13 @@
 import-module ActiveDirectory
 Add-Type -AssemblyName PresentationCore,PresentationFramework
+
+#function to take the information about the requested user and generate the html code to display the user
 function GenerateFile {
     param(
       [Parameter(Mandatory = $true)]
       [String] $Accname
     )
+    #CSS code for the HTML file
     $Header = @"
     <style>
         body {
@@ -92,9 +95,10 @@ function GenerateFile {
     </style>
     
 "@
-    
+    #take the requested username and reassign the variable
     $DesiredUser = $Accname
     
+    #querry the users information from Active Directory
     $User_Desc = Get-ADUser -Identity $DesiredUser -Properties Description |
      Select-Object -ExpandProperty Description
     
@@ -118,6 +122,8 @@ function GenerateFile {
     
      $User_Office = Get-ADUser -Identity $DesiredUser -Properties office|
      Select-Object -ExpandProperty office
+
+     #Create the hashtable that will structure the html page
     $htmlParams = @{
         Head = $Header 
         Title = "This is Description"
@@ -136,17 +142,17 @@ function GenerateFile {
         "<div class='inLineText'><h3>Office:  </h3> <h2> " + $User_Office+ "</h2></div>" +
         "</div> "
       }
+    #convert code to html file
     ConvertTo-Html @htmlParams |
     Out-File Show-User-Description.html
-     
+    #open the html file
     Start-Process .\Show-User-Description.html  
-    
 
-    
   }
 
 [void][system.reflection.assembly]::loadwithpartialname("System.Windows.Forms")
 
+#function to see if the requested user exists in AD 
 function Test-ADUser {
     param(
       [Parameter(Mandatory = $true)]
@@ -155,8 +161,8 @@ function Test-ADUser {
     $null -ne ([ADSISearcher] "(sAMAccountName=$sAMAccountName)").FindOne()
   }
 
+#function  to run the Test-ADUser and GenerateFile  functions. Throw an error if user does not exist.
 Function Searching
-
 {
     $Input = $SearchBox.Text
     if (Test-ADUser($Input)){
@@ -168,34 +174,38 @@ Function Searching
 }
 
 
-
+#createa windows gui form data
+#form container
 $form1 = New-Object System.Windows.Forms.Form
 $form1.ClientSize = "550,150"
 $form1.StartPosition = "CenterScreen"
 $form1.Text = "Searching For Users"
 
+#label for search bar
 $Search = New-Object System.Windows.Forms.Label
 $Search.Size = New-Object System.Drawing.size(140,40)
 $Search.Location = New-Object System.Drawing.size(20,20)
 $Search.Text = "Enter an Accounts Username:"
 
+#text box for user to type in user's name
 $SearchBox = New-Object System.Windows.Forms.TextBox
 $SearchBox.Location = New-Object System.Drawing.Size(170,20)
 $SearchBox.Size = New-Object System.Drawing.Size(240,70)
 
+#button to submit the form
 $SearchButton = New-Object System.Windows.Forms.Button
 $SearchButton.Text = "Search"
 $SearchButton.Size = New-Object System.Drawing.Size(100,40)
 $SearchButton.Location = New-Object System.Drawing.Size(420,20)
-
+#listener for if button is clicked, run the Searching function
 $SearchButton.Add_Click({Searching})
 
-
-
+#add the form features
+$form1.AcceptButton = $SearchButton
 $form1.Controls.Add($Search)
 $form1.Controls.Add($SearchBox)
 $form1.Controls.Add($SearchButton)
-
+#display the form
 $Input = $form1.ShowDialog()
-
+[System.Windows.Forms.Application]::EnableVisualStyles()
 
