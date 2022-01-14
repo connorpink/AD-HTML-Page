@@ -1,14 +1,11 @@
 import-module ActiveDirectory
 
-$HTML_Form = @"
-<style>
-    body {
-         
-    }
+[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
 
+$title = 'User Search'
+$msg   = 'Enter the user you wish to find'
 
-
-"@
+$text = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
 
 $Header = @"
 <style>
@@ -95,9 +92,13 @@ $Header = @"
     }
 
 </style>
-
+<script> 
+    document.getElementById('search-again').addEventListener('click', function(){
+        window.open('/test.ps1')
+    }
+</script>
 "@
-$DesiredUser = "Cmillson" 
+$DesiredUser = $text
 
 $User_Desc = Get-ADUser -Identity $DesiredUser -Properties Description |
  Select-Object -ExpandProperty Description
@@ -138,9 +139,12 @@ $htmlParams = @{
     "<div class='inLineText'><h3>Job Title:  </h3> <h2> " + $User_JobTitle + "</h2></div>"+
     "<div class='inLineText'><h3>Company:  </h3> <h2> " + $User_Company+ "</h2></div>" +
     "<div class='inLineText'><h3>Office:  </h3> <h2> " + $User_Office+ "</h2></div>" +
-    "</div>"
+    "</div> 
+    <button id = 'search-again'>search again</button>
+    "
   }
 ConvertTo-Html @htmlParams |
 Out-File Show-User-Description.html
  
 Start-Process .\Show-User-Description.html  
+
