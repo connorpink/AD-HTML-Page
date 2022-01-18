@@ -138,6 +138,9 @@ function GenerateFile {
      $User_Office = Get-ADUser -Identity $DesiredUser -Properties office|
      Select-Object -ExpandProperty office
 
+     $User_Phone = Get-ADUser -Identity $DesiredUser -Properties telephoneNumber|
+     Select-Object -ExpandProperty telephoneNumber
+
      $User_ManagerTemp = Get-ADUser -Identity $DesiredUser -Properties Manager|
      Select-Object -ExpandProperty Manager
 
@@ -149,6 +152,7 @@ function GenerateFile {
 
      $assignToPostContent = "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $User_Name + "</h2></div>" + 
      "<div class='inLineText'><h3>Email:  </h3> <h2> " + $User_Email + "</h2></div>" +
+     "<div class='inLineText'><h3>Phone Number:  </h3> <h2> " + $User_Phone + "</h2></div>" +
      "<div class='inLineText'><h3>Full Name:  </h3> <h2> " + $User_FullName + "</h2></div>" +
      "<div class='inLineText'><h3>Description:  </h3> <h2> " + $User_Desc + "</h2></div>" +
      "<div class='inLineText'><h3>Department:  </h3> <h2> " + $User_Department + "</h2></div>"+
@@ -172,7 +176,7 @@ function GenerateFile {
             $nameOfGroup = $g.name
             $assignToPostContent += "
                 <tr>
-                    <td>$nameOfGroup name`</td>
+                    <td>$nameOfGroup</td>
                 </tr>
                 
             "
@@ -181,9 +185,8 @@ function GenerateFile {
     $assignToPostContent += "
             </tbody>
         </table></div>
-    </div>
     "
-
+    $assignToPostContent += "</div>"
      #Create the hashtable that will structure the html page
     $htmlParams = @{
         Head = $Header +"<link rel='preconnect' href='https://fonts.googleapis.com'>
