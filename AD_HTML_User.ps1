@@ -232,11 +232,70 @@ Function Searching
     }
 }
 
+Function NewSearchBar
+{
+    #remove copy user box
+    $form1.Controls.RemoveByKey("CopyNewUserBox")
+    #label for search second bar
+    $CompareSearch = New-Object System.Windows.Forms.Label
+    $CompareSearch.Size = New-Object System.Drawing.size(140,40)
+    $CompareSearch.Name = "CompareSearch"
+    $CompareSearch.Location = New-Object System.Drawing.size(20,70)
+    $CompareSearch.Text = "Enter a second Account's Username:"
 
-#createa windows gui form data
+    #text box for user to type in user's name
+    $CompareSearchBox = New-Object System.Windows.Forms.TextBox
+    $CompareSearchBox.Location = New-Object System.Drawing.Size(170,70)
+    $CompareSearchBox.Size = New-Object System.Drawing.Size(240,70)
+    $CompareSearchBox.Name = "CompareSearchBox"
+
+    $form1.Controls.Add($CompareSearchBox)
+    $form1.Controls.Add($CompareSearch)
+}
+Function RemoveSearchBar
+{
+    $form1.Controls.RemoveByKey("CompareSearchBox")
+    $form1.Controls.RemoveByKey("CompareSearch")
+    #add back other checkbox for recovered functionality
+    $form1.Controls.Add($CopyNewUserBox)
+    $form1.Refresh()
+}
+
+Function NewSearchBarCopy
+{
+    #remove oppostite button 
+    $form1.Controls.RemoveByKey("CompareBox")
+    #label for search second bar
+    $CopySearch = New-Object System.Windows.Forms.Label
+    $CopySearch.Size = New-Object System.Drawing.size(140,40)
+    $CopySearch.Name = "CopySearch"
+    $CopySearch.Location = New-Object System.Drawing.size(20,70)
+    $CopySearch.Text = "Enter a second Account's Username to copy all data to:"
+
+    #text box for user to type in user's name
+    $CopySearchBox = New-Object System.Windows.Forms.TextBox
+    $CopySearchBox.Location = New-Object System.Drawing.Size(170,70)
+    $CopySearchBox.Size = New-Object System.Drawing.Size(240,70)
+    $CopySearchBox.Name = "CopySearchBox"
+
+    $form1.Controls.Add($CopySearchBox)
+    $form1.Controls.Add($CopySearch)
+}
+Function RemoveSearchBarCopy
+{
+    $form1.Controls.RemoveByKey("CopySearchBox")
+    $form1.Controls.RemoveByKey("CopySearch")
+    #add back other checkbox for recovered functionality
+    $form1.Controls.Add($CompareBox)
+
+    $form1.Refresh()
+}
+
+
+#create a windows gui form data
 #form container
 $form1 = New-Object System.Windows.Forms.Form
-$form1.ClientSize = "550,105"
+$form1.ClientSize = "550,250"
 $form1.StartPosition = "CenterScreen"
 $form1.Text = "Searching For Users"
 
@@ -259,11 +318,47 @@ $SearchButton.Location = New-Object System.Drawing.Size(420,20)
 #listener for if button is clicked, run the Searching function
 $SearchButton.Add_Click({Searching})
 
+#comparison check box 
+$CompareBox = New-Object System.Windows.Forms.CheckBox
+$CompareBox.location = New-Object System.Drawing.size(20, 120)
+$CompareBox.size = New-Object System.Drawing.size(180, 20)
+$CompareBox.Checked = $false
+$CompareBox.text = "Compare to another User..."
+$CompareBox.Name = "CompareBox"
+$CompareBox.add_CheckedChanged({
+    if ($CompareBox.Checked -eq $true){
+        NewSearchBar
+    }
+    if ($CompareBox.Checked -eq $false){
+        RemoveSearchBar
+    }
+})
+
+#Copy check box 
+$CopyNewUserBox = New-Object System.Windows.Forms.CheckBox
+$CopyNewUserBox.location = New-Object System.Drawing.size(200, 120)
+$CopyNewUserBox.size = New-Object System.Drawing.size(180, 20)
+$CopyNewUserBox.Checked = $false
+$CopyNewUserBox.text = "Copy to another User..."
+$CopyNewUserBox.Name = "CopyNewUserBox"
+$CopyNewUserBox.add_CheckedChanged({
+    if ($CopyNewUserBox.Checked -eq $true){
+        NewSearchBarCopy
+    }
+    if ($CopyNewUserBox.Checked -eq $false){
+        RemoveSearchBarCopy
+    }
+})
+
+
+
 #add the form features
 $form1.AcceptButton = $SearchButton
 $form1.Controls.Add($Search)
 $form1.Controls.Add($SearchBox)
 $form1.Controls.Add($SearchButton)
+$form1.Controls.Add($CompareBox)
+$form1.Controls.Add($CopyNewUserBox)
 #display the form
 $User_Input = $form1.ShowDialog()
 [System.Windows.Forms.Application]::EnableVisualStyles()
