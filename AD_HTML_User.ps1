@@ -34,6 +34,7 @@ function GenerateFile {
             margin-right: 1vh;
             display:flex;
             flex-direction: column;
+            justify-content:center;
         }
         .title{
             margin: 0;
@@ -282,16 +283,30 @@ function GenerateFileCompare {
         
         flex-wrap: wrap;
     }
-    .table{
+    .table1{
         margin: 0;
         position: relative;
-        bottom: 0px;
+        float: right;
+    }
+    .table2{
+        margin: 0;
+        position: relative;
+        float: left;
+    }
+    .allTables {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
     }
     .info{
         margin: 0;
         margin-right: 1vh;
         display:flex;
         flex-direction: column;
+    }
+    .allInfo{
+        display: flex;
+        justify-content: center;
     }
     .title{
         margin: 0;
@@ -352,15 +367,14 @@ function GenerateFileCompare {
         border-bottom: 1px solid #dddddd;
     }
 
-
-    .styled-table tbody tr:nth-of-type(odd) {
-        background-color: #ffffff;
+    .bad {
+        background-color: #f7aaad;
     }
-    .styled-table tbody tr:nth-of-type(even) {
-        background-color: #f7f7f7;
+   .good {
+        background-color: #a3f9c0;
         
     }
-
+    
     .styled-table tbody tr:last-of-type {
         border-bottom: 2px solid;
     }
@@ -459,7 +473,7 @@ function GenerateFileCompare {
      $First_User_Manager = Get-ADUser -Identity $First_User_ManagerTemp -Properties DisplayName|
      Select-Object -ExpandProperty DisplayName
 
-     $First_Groups = Get-ADPrincipalGroupMembership -Identity $FirstUser | Select-Object Name 
+    # $First_Groups = Get-ADPrincipalGroupMembership -Identity $FirstUser | Select-Object Name 
 
      #Second User CODE ------------------
     #querry the users information from Active Directory for the First User
@@ -533,8 +547,8 @@ function GenerateFileCompare {
     
     
     
-    $assignToPostContent += "<div>" #for all tables div
-    $assignToPostContent += "<div class='table'>
+    $assignToPostContent += "<div class ='allTables'>" #for all tables div
+    $assignToPostContent += "<div class='table1'>
 	<table class = 'styled-table'>
 		<thead>
 			<tr>
@@ -543,26 +557,69 @@ function GenerateFileCompare {
 		</thead>
     <tbody>
     "
-    foreach ($g in $First_Groups.GetEnumerator() )
-        {
-            #Write-Host $g.name
-            $nameOfGroup = $g.name
-            $assignToPostContent += "
-                <tr>
-                    <td>$nameOfGroup</td>
-                </tr>
-                
-            "
+        #FOR JAX DON'T TOUCH 
+    $FirstUserList= @()
+    $SecondUserList = @()
+    
+    $FirstUserNotEqual = @()
+    
+    $SecondUserNotEqual = @()
+    
+    
+        $d = Get-ADPrincipalGroupMembership -Identity $FirstUser | Select-Object Name
+        Foreach ($y IN $d) {
+        $FirstUserList += $y.name
         }
+    
+        $e = Get-ADPrincipalGroupMembership -Identity $SecondUser | Select-Object Name
+        Foreach ($y IN $e) {
+        $SecondUserList += $y.name
+        }
+        $FirstUserList | ForEach-Object {
+        if ($SecondUserList -notcontains $_) {
+            $SecondUserNotEqual += $_
+        }
+    }
+    
+    
+      $SecondUserList | ForEach-Object {
+        if ($FirstUserList -notcontains $_) {
+           $FirstUserNotEqual += $_
+        }
+    }
+
+
+       #foreach ($g in $Second_Groups.GetEnumerator() )
+       foreach ($g in $FirstUserList)
+       {
+        if ($SecondUserNotEqual -contains $g) {
+            $nameOfGroup = $g
+    
+            $assignToPostContent += "
+            <tr class = 'bad'>
+                <td>$nameOfGroup</td>
+            </tr>
+        "
+        }
+        else {
+           #Write-Host $g.name
+           $nameOfGroup = $g
+           $assignToPostContent += "
+               <tr class = 'good'>
+                   <td>$nameOfGroup</td>
+               </tr>
+               
+           "}
+       }
 
     $assignToPostContent += "
             </tbody>
         </table></div>
-    "
+    "#close table div^
     
 
 
-    $assignToPostContent += "<div class='table'>
+    $assignToPostContent += "<div class='table2'>
     <table class = 'styled-table'>
     <thead>
         <tr>
@@ -571,22 +628,32 @@ function GenerateFileCompare {
     </thead>
     <tbody>
     "
-    foreach ($g in $Second_Groups.GetEnumerator() )
-   {
-       #Write-Host $g.name
-       $nameOfGroup = $g.name
-       $assignToPostContent += "
-           <tr>
-               <td>$nameOfGroup</td>
-           </tr>
-           
-       "
-   }
+    #foreach ($g in $First_Groups.GetEnumerator() )
+    foreach ($g in $SecondUserList)
+        {
+            #Write-Host $g.name
+            if ($FirstUserNotEqual -contains $g) {
+                $nameOfGroup = $g
+
+                $assignToPostContent += "
+                <tr class = 'bad'>
+                    <td>$nameOfGroup</td>
+                </tr>
+            "
+            }
+            else {
+            $nameOfGroup = $g
+            $assignToPostContent += "
+                <tr class = 'good'>
+                    <td>$nameOfGroup</td>
+                </tr>
+            "}
+        }
 
     $assignToPostContent += "
         </tbody>
     </table></div>
-    "
+    "#close table div^
     
     
 
@@ -653,7 +720,7 @@ Function Searching
     }
     else {
         $User_Input = $SearchBox.Text
-        Write-Host $User_Input
+        #Write-Host $User_Input
         if (Test-ADUser($User_Input)){
             GenerateFile($User_Input)
         }
