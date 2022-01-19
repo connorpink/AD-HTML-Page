@@ -284,7 +284,7 @@ function GenerateFileCompare {
     }
     .table{
         margin: 0;
-        position: sticky;
+        position: relative;
         bottom: 0px;
     }
     .info{
@@ -460,50 +460,11 @@ function GenerateFileCompare {
      Select-Object -ExpandProperty DisplayName
 
      $First_Groups = Get-ADPrincipalGroupMembership -Identity $FirstUser | Select-Object Name 
-    
-    $assignToPostContent += "<div class = 'allInfo'>"
-    $assignToPostContent += "<div class = 'firstUser'>"
 
-    if ($First_User_Name){ $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $First_User_Name + "</h2></div>"}
-    if ($First_User_Email){ $assignToPostContent +="<div class='inLineText'><h3>Email:  </h3> <h2> " + $First_User_Email + "</h2></div>"}
-    if ($First_User_Phone){ $assignToPostContent +="<div class='inLineText'><h3>Phone Number:  </h3> <h2> " + $First_User_Phone + "</h2></div>"}
-    if ($First_User_FullName){ $assignToPostContent +="<div class='inLineText'><h3>Full Name:  </h3> <h2> " + $First_User_FullName + "</h2></div>"}
-    if ($First_User_Desc){ $assignToPostContent +="<div class='inLineText'><h3>Description:  </h3> <h2> " + $First_User_Desc + "</h2></div>"}
-    if ($First_User_Department){ $assignToPostContent +="<div class='inLineText'><h3>Department:  </h3> <h2> " + $First_User_Department + "</h2></div>"}
-    if ($First_User_JobTitle){ $assignToPostContent +="<div class='inLineText'><h3>Job Title:  </h3> <h2> " + $First_User_JobTitle + "</h2></div>"}
-    if ($First_User_Company){ $assignToPostContent +="<div class='inLineText'><h3>Company:  </h3> <h2> " + $First_User_Company+ "</h2></div>"}
-    if ($First_User_Office){ $assignToPostContent +="<div class='inLineText'><h3>Office:  </h3> <h2> " + $First_User_Office+ "</h2></div>"}
-    if ($First_User_Manager){ $assignToPostContent +="<div class='inLineText'><h3>Manager:  </h3> <h2> " + $First_User_Manager+ "</h2></div></div>"}
-    $assignToPostContent += "<div class='table'>
-	<table class = 'styled-table'>
-		<thead>
-			<tr>
-				<th>Security Groups on User</th>
-			</tr>
-		</thead>
-    <tbody>
-    "
-    foreach ($g in $First_Groups.GetEnumerator() )
-        {
-            #Write-Host $g.name
-            $nameOfGroup = $g.name
-            $assignToPostContent += "
-                <tr>
-                    <td>$nameOfGroup</td>
-                </tr>
-                
-            "
-        }
-
-    $assignToPostContent += "
-            </tbody>
-        </table></div>
-    "
-    $assignToPostContent += "</div>" #for first user div
-
-    #Second User CODE ------------------
+     #Second User CODE ------------------
     #querry the users information from Active Directory for the First User
     $assignToPostContent += "<div class = 'secondUser'>"
+
     $Second_User_Desc = Get-ADUser -Identity $SecondUser -Properties Description |
     Select-Object -ExpandProperty Description
 
@@ -538,6 +499,22 @@ function GenerateFileCompare {
     Select-Object -ExpandProperty DisplayName
 
     $Second_Groups = Get-ADPrincipalGroupMembership -Identity $SecondUser | Select-Object Name 
+    
+    $assignToPostContent += "<div class = 'allInfo'>"
+    $assignToPostContent += "<div class = 'firstUser'>"
+
+    if ($First_User_Name){ $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $First_User_Name + "</h2></div>"}
+    if ($First_User_Email){ $assignToPostContent +="<div class='inLineText'><h3>Email:  </h3> <h2> " + $First_User_Email + "</h2></div>"}
+    if ($First_User_Phone){ $assignToPostContent +="<div class='inLineText'><h3>Phone Number:  </h3> <h2> " + $First_User_Phone + "</h2></div>"}
+    if ($First_User_FullName){ $assignToPostContent +="<div class='inLineText'><h3>Full Name:  </h3> <h2> " + $First_User_FullName + "</h2></div>"}
+    if ($First_User_Desc){ $assignToPostContent +="<div class='inLineText'><h3>Description:  </h3> <h2> " + $First_User_Desc + "</h2></div>"}
+    if ($First_User_Department){ $assignToPostContent +="<div class='inLineText'><h3>Department:  </h3> <h2> " + $First_User_Department + "</h2></div>"}
+    if ($First_User_JobTitle){ $assignToPostContent +="<div class='inLineText'><h3>Job Title:  </h3> <h2> " + $First_User_JobTitle + "</h2></div>"}
+    if ($First_User_Company){ $assignToPostContent +="<div class='inLineText'><h3>Company:  </h3> <h2> " + $First_User_Company+ "</h2></div>"}
+    if ($First_User_Office){ $assignToPostContent +="<div class='inLineText'><h3>Office:  </h3> <h2> " + $First_User_Office+ "</h2></div>"}
+    if ($First_User_Manager){ $assignToPostContent +="<div class='inLineText'><h3>Manager:  </h3> <h2> " + $First_User_Manager+ "</h2></div></div>"}
+
+    $assignToPostContent += "</div>"    # for first user close div
 
 
     if ($Second_User_Name){ $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $Second_User_Name + "</h2></div>"}
@@ -550,6 +527,41 @@ function GenerateFileCompare {
     if ($Second_User_Company){ $assignToPostContent +="<div class='inLineText'><h3>Company:  </h3> <h2> " + $Second_User_Company+ "</h2></div>"}
     if ($Second_User_Office){ $assignToPostContent +="<div class='inLineText'><h3>Office:  </h3> <h2> " + $Second_User_Office+ "</h2></div>"}
     if ($Second_User_Manager){ $assignToPostContent +="<div class='inLineText'><h3>Manager:  </h3> <h2> " + $Second_User_Manager+ "</h2></div></div>"}
+
+    $assignToPostContent += "</div>" #for second user div
+    $assignToPostContent += "</div>" #for All info div
+    
+    
+    
+    $assignToPostContent += "<div>" #for all tables div
+    $assignToPostContent += "<div class='table'>
+	<table class = 'styled-table'>
+		<thead>
+			<tr>
+				<th>Security Groups on User</th>
+			</tr>
+		</thead>
+    <tbody>
+    "
+    foreach ($g in $First_Groups.GetEnumerator() )
+        {
+            #Write-Host $g.name
+            $nameOfGroup = $g.name
+            $assignToPostContent += "
+                <tr>
+                    <td>$nameOfGroup</td>
+                </tr>
+                
+            "
+        }
+
+    $assignToPostContent += "
+            </tbody>
+        </table></div>
+    "
+    
+
+
     $assignToPostContent += "<div class='table'>
     <table class = 'styled-table'>
     <thead>
@@ -575,7 +587,8 @@ function GenerateFileCompare {
         </tbody>
     </table></div>
     "
-    $assignToPostContent += "</div>" #for second user div
+    
+    
 
 
     
