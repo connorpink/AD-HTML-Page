@@ -284,6 +284,8 @@ function GenerateFileCompare {
     }
     .table{
         margin: 0;
+        position: sticky;
+        bottom: 0px;
     }
     .info{
         margin: 0;
@@ -374,7 +376,7 @@ function GenerateFileCompare {
         flex-direction: column;
         float: left;
         margin: 1vh;
-
+        flex-grow; 1;
     } 
     .secondUser{
         
@@ -629,8 +631,6 @@ Function Searching
     ElseIf ($CompareBox.Checked -eq $true){
         $User_Input = $SearchBox.Text
         $Second_Input = $CompareSearchBox.Text
-        Write-Host $Second_Input
-        Write-Host $User_Input
         if ((Test-ADUser($User_Input)) -and (Test-ADUser($Second_Input))){
             GenerateFileCompare $User_Input $Second_Input
         }
