@@ -398,6 +398,7 @@ function GenerateFileCompare {
         flex-direction: column;
         float right;
         margin: 1vh;
+        flex-grow; 1;
     }
     .header {
         display: block;
@@ -512,7 +513,7 @@ function GenerateFileCompare {
     $Second_User_Manager = Get-ADUser -Identity $Second_User_ManagerTemp -Properties DisplayName|
     Select-Object -ExpandProperty DisplayName
 
-    $Second_Groups = Get-ADPrincipalGroupMembership -Identity $SecondUser | Select-Object Name 
+   # $Second_Groups = Get-ADPrincipalGroupMembership -Identity $SecondUser | Select-Object Name 
     
     $assignToPostContent += "<div class = 'allInfo'>"
     $assignToPostContent += "<div class = 'firstUser'>"
@@ -529,6 +530,7 @@ function GenerateFileCompare {
     if ($First_User_Manager){ $assignToPostContent +="<div class='inLineText'><h3>Manager:  </h3> <h2> " + $First_User_Manager+ "</h2></div></div>"}
 
     $assignToPostContent += "</div>"    # for first user close div
+    $assignToPostContent += "<div class = 'secondUser'>"    # for first user close div
 
 
     if ($Second_User_Name){ $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $Second_User_Name + "</h2></div>"}
@@ -552,7 +554,7 @@ function GenerateFileCompare {
 	<table class = 'styled-table'>
 		<thead>
 			<tr>
-				<th>Security Groups on User</th>
+				<th>Member of for User</th>
 			</tr>
 		</thead>
     <tbody>
@@ -587,6 +589,10 @@ function GenerateFileCompare {
            $FirstUserNotEqual += $_
         }
     }
+
+    $FirstUserList | Sort-Object
+    $SecondUserList | Sort-Object
+
 
 
        #foreach ($g in $Second_Groups.GetEnumerator() )
@@ -623,7 +629,7 @@ function GenerateFileCompare {
     <table class = 'styled-table'>
     <thead>
         <tr>
-            <th>Security Groups on User</th>
+            <th>Member of for User</th>
         </tr>
     </thead>
     <tbody>
