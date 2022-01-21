@@ -1133,7 +1133,7 @@ $CopyFirstName = New-Object System.Windows.Forms.Label
 $CopyFirstName.Size = New-Object System.Drawing.size(140,40)
 $CopyFirstName.Name = "CopySearch"
 $CopyFirstName.Location = New-Object System.Drawing.size(20,60)
-$CopyFirstName.Text = "enter new account first name"
+$CopyFirstName.Text = "Enter new account first name"
 $CopyFirstName.Visible = $false
 
 #text box for Name to type in Name's name
@@ -1149,7 +1149,7 @@ $CopyLastName = New-Object System.Windows.Forms.Label
 $CopyLastName.Size = New-Object System.Drawing.size(140,40)
 $CopyLastName.Name = "CopySearch"
 $CopyLastName.Location = New-Object System.Drawing.size(20,100)
-$CopyLastName.Text = "enter new account Last name"
+$CopyLastName.Text = "Enter new account Last name"
 $CopyLastName.Visible = $false
 
 #text box for Name to type in Name's name
@@ -1164,10 +1164,10 @@ $CopyUserName = New-Object System.Windows.Forms.Label
 $CopyUserName.Size = New-Object System.Drawing.size(140,40)
 $CopyUserName.Name = "CopySearch"
 $CopyUserName.Location = New-Object System.Drawing.size(20,140)
-$CopyUserName.Text = "enter new account User name"
+$CopyUserName.Text = "Enter new account User name"
 $CopyUserName.Visible = $false
 
-#text box for Name to type in Name's name
+#text box for Name to type in Name's name  
 $CopyUserNameBox = New-Object System.Windows.Forms.TextBox
 $CopyUserNameBox.Location = New-Object System.Drawing.Size(170,140)
 $CopyUserNameBox.Size = New-Object System.Drawing.Size(240,70)
