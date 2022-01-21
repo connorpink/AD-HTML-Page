@@ -866,8 +866,12 @@ Function Searching {
         if ($CopyNetNewUserBox.Checked -eq $true) {
             if (Test-ADUser($oldUser)) {
                 if (Test-ADUser($newUserUserName)) {
+                    [System.Windows.MessageBox]::Show('Attempted net new user lready exists')
+                }
+                else{
                     $newUserFirstName = $CopyFirstNameBox.Text
                     $newUserLastName = $CopyLastNameBox.Text
+                    
                     #generate email
                     $newUserEmail = $newUserUserName + "@prhc.on.ca"
                     #generate displayName
@@ -876,7 +880,7 @@ Function Searching {
                     #retrieve info from oldUser such as description, department, member of,  security... etc 
                     $user = Get-ADUser $oldUser -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
                     
-                    #create new user with firstName, lastName, userName, and email
+                    #create new user with firstName, lastName, userName, email and everything else
                     
                     New-ADUser -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
 
@@ -902,28 +906,27 @@ Function Searching {
                         }
                     }
 
-                    #At the end generate a file of a comparison of new user compared to old user
-                    #to show that new user is idenitical to old
-
+                    
+                    #small method to ensure that the new AD account exists and is online before trying to generate the account 
                     $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
 
                     $CheckArray = @()
 
-
+                    
                     while ($CheckArray.Length -ne ($u.Length - $counter)) { 
+                        try{
                         $CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name
+                        }
+                        catch{
+                            
+                        }
                         Start-Sleep -Seconds 2
                     }
-
-
-
-                    #Start-Sleep -s 17
+                    #At the end generate a file of a comparison of new user compared to old user
+                    #to show that new user is idenitical to old
                     GenerateFileCompare $oldUser $newUserUserName
 
                     
-                }
-                else {
-                    [System.Windows.MessageBox]::Show('User Already Exists')
                 }
             }
             else {
@@ -1484,13 +1487,13 @@ $form1.Controls.Add($SearchBox)
 $form1.Controls.Add($CompareSearchBox)
 $form1.Controls.Add($CompareSearch)
 
-
+$form1.Controls.Add($CopyUserNameBox)
+$form1.Controls.Add($CopyUserName)
 $form1.Controls.Add($CopyFirstNameBox)
 $form1.Controls.Add($CopyFirstName)
 $form1.Controls.Add($CopyLastNameBox)
 $form1.Controls.Add($CopyLastName)
-$form1.Controls.Add($CopyUserNameBox)
-$form1.Controls.Add($CopyUserName)
+
 
 #add the form features
 $form1.AcceptButton = $SearchButton
