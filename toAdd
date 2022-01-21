@@ -1,0 +1,16 @@
+functionality for copy to another user
+
+copy data to existing user should only copy the member of groups.
+possible checkbox  for copy member of groups and description,office, job, etc
+not necessary^ 
+
+make default functionality to copy to existing user  rather than net new
+
+upon box tick, show second username textbox, and another 
+checkbox "net new user"
+
+if "net new user" box not checked, but second user does not 
+exist, prompt user that user does not exist 
+
+
+add third box for overwrite member of groups or append member of groups
