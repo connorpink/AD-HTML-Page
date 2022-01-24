@@ -1005,7 +1005,7 @@ Function Searching {
                     }
                     #new user  does not exist
                     else {
-                        [System.Windows.MessageBox]::Show('User copying from does not exist')
+                        [System.Windows.MessageBox]::Show('User copying to does not exist')
                     }
                 }
                 #old user does not exist
@@ -1273,13 +1273,15 @@ Function RemoveSearchBarCopy {
     $form1.Refresh()
 }
 Function removeNetNewUser {
+    
     $CopyNetNewUserBox.Visible = $false
-    $CopyNetNewUserBox.Checked = $false
-
+    $CopyNetNewUserBox.Checked = $false    
+    
 }
 Function addNetNewUserBack {
-    $CopyNetNewUserBox.Visible = $true
-
+    if(($CopyOverwriteGroupsBox.Checked -eq $false) -and ($CopyOverwritePropertiesBox.Checked -eq $false)){
+        $CopyNetNewUserBox.Visible = $true
+    }
 }
 
 Function NetNewRemoveCopy {
