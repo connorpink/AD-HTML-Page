@@ -942,7 +942,6 @@ Function Searching {
                 if (Test-ADUser($oldUser)) {
                     #if new user exists
                     if (Test-ADUser($newUserUserName)) {
-                        #[System.Windows.MessageBox]::Show('selected username of new  User is already taken') 
     
     
                         #add functionality here ---------------
@@ -950,6 +949,7 @@ Function Searching {
                      
                         $existingUserUserName = $CopyUserNameBox.Text
                      
+                         #remove old groups?
                         Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName
                     
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
@@ -966,7 +966,7 @@ Function Searching {
     
                         Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
     
-                        #remove old groups?
+                       
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
@@ -1013,7 +1013,7 @@ Function Searching {
                     [System.Windows.MessageBox]::Show('User copying from does not exist')
                 }
             }
-            #If only overwrite box is checked, overwrite groups
+            #If only overwrite box is checked, overwrite groups and not properties or OU
             else {
                 #if old user exists
                 if (Test-ADUser($oldUser)) {
@@ -1067,7 +1067,7 @@ Function Searching {
                     }
                     #if new user does not exist
                     else {
-                        [System.Windows.MessageBox]::Show('User copying from does not exist')
+                        [System.Windows.MessageBox]::Show('User copying to does not exist')
                     }
                 }
                 #if old user does not exists
@@ -1077,16 +1077,13 @@ Function Searching {
             }
     
         }
-        # ONLY COPY properties and append member of groups
+        # copy properties and append member of groups
         Elseif ($CopyOverwritePropertiesBox.Checked -eq $true) {
             #if old user exists
             if (Test-ADUser($oldUser)) {
                 #if new user exists
                 if (Test-ADUser($newUserUserName)) {
 
-                     #[System.Windows.MessageBox]::Show('selected username of new  User is already taken') 
-    
-    
                         #add functionality here ---------------
                         $oldUser = $SearchBox.Text
                      
@@ -1095,7 +1092,7 @@ Function Searching {
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
                         $user = Get-ADUser $oldUser -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
                     
-                        #modify eisting user information using $existingUserUserName
+                        #modify existing user information using $existingUserUserName
                         Set-ADUser -Identity $existingUserUserName -Instance $user 
                         #change new user OU location
     
@@ -1106,7 +1103,7 @@ Function Searching {
     
                         Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
     
-                        #remove old groups?
+                        #dont remove old groups
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
@@ -1159,8 +1156,25 @@ Function Searching {
             if (Test-ADUser($oldUser)) {
                 #if new user exists run code
                 if (Test-ADUser($newUserUserName)) {
-
-               }
+                    #add functionality here ---------------
+                    $oldUser = $SearchBox.Text
+                                        
+                    $existingUserUserName = $CopyUserNameBox.Text
+                    
+                    #Append Groups over
+                    $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                    Foreach ($g IN $d) {
+                        if ($g.name -ne 'Domain Users') {
+                            try {
+                                Add-ADGroupMember -Identity $g.name -Members $newUserUserName
+                            }
+                            catch {
+                                $counter += 1
+                            }
+                        }
+                    }
+                
+                }
                #else new user does not exist throw error
                else {
                    [System.Windows.MessageBox]::Show('User copying from does not exist')
@@ -1289,11 +1303,15 @@ Function NetNewRemoveCopy {
     $CopyOverwritePropertiesBox.Visible = $false
     $CopyOverwriteGroupsBox.Checked = $false
     $CopyOverwritePropertiesBox.Checked = $false
+    
 }
 
 Function NetNewAddCopy {
     $CopyOverwriteGroupsBox.Visible = $true
     $CopyOverwritePropertiesBox.Visible = $true
+
+    $CopyLastNameBox.Text = ''
+    $CopyFirstNameBox.Text = ''
 }
 
 #create a windows gui form data
