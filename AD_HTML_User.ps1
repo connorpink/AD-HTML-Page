@@ -908,12 +908,12 @@ Function Searching {
 
                     
                     #small method to ensure that the new AD account exists and is online before trying to generate the account 
-                    $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                    
 
                     $CheckArray = @()
 
                     
-                    while ($CheckArray.Length -ne ($u.Length - $counter)) { 
+                    while ($CheckArray.Length -ne ($d.Length - $counter)) { 
                         try{
                         $CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name
                         }
@@ -937,7 +937,7 @@ Function Searching {
         Elseif ($CopyOverwriteGroupsBox.Checked -eq $true) {
 
             #Check if overwrite member of groups box is checked and if overwrite properties is checked
-            if ($CopyOverwritePropertiesBox -eq $true) {
+            if ($CopyOverwritePropertiesBox.Checked -eq $true) {
                 #if old user exists
                 if (Test-ADUser($oldUser)) {
                     #if new user exists
@@ -950,10 +950,10 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
                      
                          #remove old groups?
-                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName
+                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
                     
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
-                        $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber
+                        $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
                     
                         #modify eisting user information using $existingUserUserName
                         try{Set-ADUser -Identity $existingUserUserName -Description $user.Description} Catch{}
@@ -963,6 +963,7 @@ Function Searching {
                         try{Set-ADUser -Identity $existingUserUserName -office $user.office} Catch{}
                         try{Set-ADUser -Identity $existingUserUserName -organization $user.organization} Catch{}
                         try{Set-ADUser -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                        try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}
                         
 
                         #change new user OU location
@@ -978,17 +979,13 @@ Function Searching {
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
-                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
-                                if ($existingUserGroupList -contains $g.name){}
-                                else{
-                                    try {
-                                        Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
-                                    }
-                                    catch {
-                                        $counter += 1
-                                    }
+                                try {
+                                    Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
+                                }
+                                catch {
+                                    $counter += 1
                                 }
                             }
                         }
@@ -996,25 +993,21 @@ Function Searching {
                         #At the end generate a file of a comparison of new user compared to old user
                         #to show that new user is idenitical to old
     
-                        $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+ 
     
                         $CheckArray = @()
     
     
-                        while ($CheckArray.Length -le ($u.Length - $counter)) { 
+                        while ($CheckArray.Length -ne ($d.Length - $counter)) { 
 
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name} catch{}
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
-    
     
     
                         #Start-Sleep -s 17
                         GenerateFileCompare $oldUser $newUserUserName
 
-
-
-       
                     }
                     #new user  does not exist
                     else {
@@ -1041,30 +1034,27 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
     
                         #remove old groups
-                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName 
+                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
 
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         Foreach ($g IN $d) {
-                            if ($g.name -ne 'Domain Users') {
-                                try {
-                                    Add-ADGroupMember -Identity $g.name -Members $newUserUserName
-                                }
-                                catch {
-                                    $counter += 1
-                                }
+                            try {
+                                Add-ADGroupMember -Identity $g.name -Members $newUserUserName
+                            }
+                            catch {
+                                $counter += 1
                             }
                         }
     
                         #At the end generate a file of a comparison of new user compared to old user
                         #to show that new user is idenitical to old
     
-                        $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
     
                         $CheckArray = @()
     
-    
-                        while ($CheckArray.Length -ne ($u.Length - $counter)) { 
+                        
+                        while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
                             $CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name
                             Start-Sleep -Seconds 2
                         }
@@ -1103,7 +1093,7 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
                     
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
-                        $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber
+                        $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
                     
                         #modify eisting user information using $existingUserUserName
                         try{Set-ADUser -Identity $existingUserUserName -Description $user.Description} Catch{}
@@ -1113,24 +1103,20 @@ Function Searching {
                         try{Set-ADUser -Identity $existingUserUserName -office $user.office} Catch{}
                         try{Set-ADUser -Identity $existingUserUserName -organization $user.organization} Catch{}
                         try{Set-ADUser -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                        try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}
 
-                        #change new user OU location
-    
-                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
-    
-                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
-    
-                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
+                        
     
                         #dont remove old groups
     
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
                         $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
+                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                        $alreadyThereCounter = 0
+                        $counter = 0
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
-                                if ($existingUserGroupList -contains $g.name){}
+                                if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
                                 else{
                                     try {
                                         Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
@@ -1141,21 +1127,23 @@ Function Searching {
                                 }
                             }
                         }
-    
+                        #change new user OU location
+                        
+                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+                        
+                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
+                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
+
+                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
                         #At the end generate a file of a comparison of new user compared to old user
                         #to show that new user is idenitical to old
     
-                        $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
-    
                         $CheckArray = @()
     
-    
-                        while ($CheckArray.Length -le ($u.Length - $counter)) {
+                        while ((($CheckArray.Length)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
                             try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
-    
-    
     
                         #Start-Sleep -s 17
                         GenerateFileCompare $oldUser $existingUserUserName
@@ -1186,14 +1174,21 @@ Function Searching {
                     $existingUserUserName = $CopyUserNameBox.Text
                     
                     #Append Groups over
-                    $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+
+                    $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
+                    $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
+                    $alreadyThereCounter = 0
+                    $counter = 0
                     Foreach ($g IN $d) {
                         if ($g.name -ne 'Domain Users') {
-                            try {
-                                Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
-                            }
-                            catch {
-                                $counter += 1
+                            if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
+                            else{
+                                try {
+                                    Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
+                                }
+                                catch {
+                                    $counter += 1
+                                }
                             }
                         }
                     }
@@ -1201,12 +1196,13 @@ Function Searching {
                     #At the end generate a file of a comparison of new user compared to old user
                     #to show that new user is idenitical to old
 
-                    $u = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                    
 
                     $CheckArray = @()
 
 
-                    while ($CheckArray.Length -ne ($u.Length - $counter)) {
+                    while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
+                        Write-Host $existingUserGroupList
                         try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
                         Start-Sleep -Seconds 2
                     }
