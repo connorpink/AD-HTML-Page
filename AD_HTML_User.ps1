@@ -978,15 +978,15 @@ Function Searching {
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
-                        $e = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
+                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
-                                if ($e -contains $g){Write-Host "user already had __"}
+                                if ($existingUserGroupList -contains $g.name){}
                                 else{
                                     try {
                                         Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
                                     }
-                                    catch [Microsoft.ActiveDirectory.Management.ADException]{
+                                    catch {
                                         $counter += 1
                                     }
                                 }
@@ -1001,7 +1001,7 @@ Function Searching {
                         $CheckArray = @()
     
     
-                        while ($CheckArray.Length -ne ($u.Length - $counter)) { 
+                        while ($CheckArray.Length -le ($u.Length - $counter)) { 
 
                             try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
@@ -1127,15 +1127,15 @@ Function Searching {
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
-                        $e = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
+                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
-                                if ($e -contains $g){Write-Host "user already had __"}
+                                if ($existingUserGroupList -contains $g.name){}
                                 else{
                                     try {
                                         Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
                                     }
-                                    catch [Microsoft.ActiveDirectory.Management.ADException]{
+                                    catch {
                                         $counter += 1
                                     }
                                 }
@@ -1150,7 +1150,7 @@ Function Searching {
                         $CheckArray = @()
     
     
-                        while ($CheckArray.Length -ne ($u.Length - $counter)) {
+                        while ($CheckArray.Length -le ($u.Length - $counter)) {
                             try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
