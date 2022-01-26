@@ -1,6 +1,72 @@
 import-module ActiveDirectory
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
+
+Function DarkMode{
+    $grey = '#484848' 
+    $black = '#2b2a2a' 
+    $white = '#ffffff'
+    $form1.BackColor = $black
+    $Search.ForeColor = $white
+    $SearchBox.BackColor = $grey
+    $SearchBox.ForeColor = $white
+    $SearchButton.ForeColor = $white
+    $CompareSearch.ForeColor = $white
+    $CompareBox.ForeColor = $white
+    $CopyExistingUserBox.ForeColor = $white
+    $CopyNetNewUserBox.ForeColor = $white
+    $CopyOverwriteGroupsBox.ForeColor = $white
+    $CopyOverwritePropertiesBox.ForeColor = $white
+    $CopyDeleteFileBox.ForeColor = $white
+    $CompareSearch.ForeColor = $white
+    $CompareSearchBox.BackColor = $grey
+    $CompareSearchBox.ForeColor = $white
+    $CopyFirstName.ForeColor = $white
+    $CopyFirstNameBox.BackColor = $grey
+    $CopyFirstNameBox.ForeColor = $white
+    $CopyLastName.ForeColor = $white
+    $CopyLastNameBox.BackColor = $grey
+    $CopyLastNameBox.ForeColor = $white
+    $CopyUserName.ForeColor = $white
+    $CopyUserNameBox.BackColor = $grey
+    $CopyUserNameBox.ForeColor = $white
+    $darkButtonBox.ForeColor = $white
+
+    
+
+}
+Function LightMode{
+    $black = '#202020' 
+    $white = '#ffffff'
+    $offWhite = '#f0f0f0'
+    $form1.BackColor = $offWhite
+    $Search.ForeColor = $black
+    $SearchBox.BackColor = $white
+    $SearchBox.ForeColor = $black
+    $SearchButton.ForeColor = $black
+    $CompareSearch.ForeColor = $black
+    $CompareBox.ForeColor = $black
+    $CopyExistingUserBox.ForeColor = $black
+    $CopyNetNewUserBox.ForeColor = $black
+    $CopyOverwriteGroupsBox.ForeColor = $black
+    $CopyOverwritePropertiesBox.ForeColor = $black
+    $CopyDeleteFileBox.ForeColor = $black
+    $CompareSearch.ForeColor = $black
+    $CompareSearchBox.BackColor = $white
+    $CompareSearchBox.ForeColor = $black
+    $CopyFirstName.ForeColor = $black
+    $CopyFirstNameBox.BackColor = $white
+    $CopyFirstNameBox.ForeColor = $black
+    $CopyLastName.ForeColor = $black
+    $CopyLastNameBox.BackColor = $white
+    $CopyLastNameBox.ForeColor = $black
+    $CopyUserName.ForeColor = $black
+    $CopyUserNameBox.BackColor = $white
+    $CopyUserNameBox.ForeColor = $black
+    $darkButtonBox.ForeColor = $black
+
+    
+}
 #function to take the information about the requested user and generate the html code to display the user
 function GenerateFile {
     param(
@@ -1662,68 +1728,3 @@ $form1.Controls.Add($SearchButton)
 $form1.ShowDialog() | out-null
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-Function DarkMode{
-    $grey = '#484848' 
-    $black = '#2b2a2a' 
-    $white = '#ffffff'
-    $form1.BackColor = $black
-    $Search.ForeColor = $white
-    $SearchBox.BackColor = $grey
-    $SearchBox.ForeColor = $white
-    $SearchButton.ForeColor = $white
-    $CompareSearch.ForeColor = $white
-    $CompareBox.ForeColor = $white
-    $CopyExistingUserBox.ForeColor = $white
-    $CopyNetNewUserBox.ForeColor = $white
-    $CopyOverwriteGroupsBox.ForeColor = $white
-    $CopyOverwritePropertiesBox.ForeColor = $white
-    $CopyDeleteFileBox.ForeColor = $white
-    $CompareSearch.ForeColor = $white
-    $CompareSearchBox.BackColor = $grey
-    $CompareSearchBox.ForeColor = $white
-    $CopyFirstName.ForeColor = $white
-    $CopyFirstNameBox.BackColor = $grey
-    $CopyFirstNameBox.ForeColor = $white
-    $CopyLastName.ForeColor = $white
-    $CopyLastNameBox.BackColor = $grey
-    $CopyLastNameBox.ForeColor = $white
-    $CopyUserName.ForeColor = $white
-    $CopyUserNameBox.BackColor = $grey
-    $CopyUserNameBox.ForeColor = $white
-    $darkButtonBox.ForeColor = $white
-
-    
-
-}
-Function LightMode{
-    $black = '#202020' 
-    $white = '#ffffff'
-    $offWhite = '#f0f0f0'
-    $form1.BackColor = $offWhite
-    $Search.ForeColor = $black
-    $SearchBox.BackColor = $white
-    $SearchBox.ForeColor = $black
-    $SearchButton.ForeColor = $black
-    $CompareSearch.ForeColor = $black
-    $CompareBox.ForeColor = $black
-    $CopyExistingUserBox.ForeColor = $black
-    $CopyNetNewUserBox.ForeColor = $black
-    $CopyOverwriteGroupsBox.ForeColor = $black
-    $CopyOverwritePropertiesBox.ForeColor = $black
-    $CopyDeleteFileBox.ForeColor = $black
-    $CompareSearch.ForeColor = $black
-    $CompareSearchBox.BackColor = $white
-    $CompareSearchBox.ForeColor = $black
-    $CopyFirstName.ForeColor = $black
-    $CopyFirstNameBox.BackColor = $white
-    $CopyFirstNameBox.ForeColor = $black
-    $CopyLastName.ForeColor = $black
-    $CopyLastNameBox.BackColor = $white
-    $CopyLastNameBox.ForeColor = $black
-    $CopyUserName.ForeColor = $black
-    $CopyUserNameBox.BackColor = $white
-    $CopyUserNameBox.ForeColor = $black
-    $darkButtonBox.ForeColor = $black
-
-    
-}
