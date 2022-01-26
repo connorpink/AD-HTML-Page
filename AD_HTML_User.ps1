@@ -297,9 +297,13 @@ function GenerateFile {
     Out-File C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
     #open the html file
     Start-Process C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
-    Start-Sleep -s 1.5
-    Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
 
+    #remove the file if box is checked 
+    if ($CopyDeleteFileBox.Checked = $true)
+    {
+        Start-Sleep -s 5
+        Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
+    }
 }
 
 #functions to generate the file for the compare users functionality
@@ -838,9 +842,13 @@ function GenerateFileCompare {
     Out-File C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
     #open the html file
     Start-Process C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
-    Start-Sleep -s 2
-    Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
 
+    #remove file if box is checked
+    if ($CopyDeleteFileBox.Checked = $true)
+    {
+        Start-Sleep -s 10
+        Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
+    }
 }
 
 
@@ -1471,6 +1479,15 @@ $CopyOverwritePropertiesBox.add_CheckedChanged({
         }
     })
 
+#delete file after doing process
+$CopyDeleteFileBox = New-Object System.Windows.Forms.CheckBox
+$CopyDeleteFileBox.location = New-Object System.Drawing.size(420, 60)
+$CopyDeleteFileBox.size = New-Object System.Drawing.size(190, 30)
+$CopyDeleteFileBox.Checked = $false
+$CopyDeleteFileBox.text = "delete temp file after..."
+$CopyDeleteFileBox.Name = "CopyDeleteFileBox"
+
+
 #label for search second bar
 $CompareSearch = New-Object System.Windows.Forms.Label
 $CompareSearch.Size = New-Object System.Drawing.size(140, 40)
@@ -1560,6 +1577,8 @@ $toolTip1.SetToolTip($SearchButton, "If no checkboxes are checked this form will
 $toolTip1.SetToolTip($SearchBox, "Enter only the username here.")
 $toolTip1.SetToolTip($CompareSearchBox, "Enter only the username of the user you would like to compare to here.")
 $toolTip1.SetToolTip($CopyUserNameBox, "Enter only the username of the user you would like to copy to here.")
+$toolTip1.SetToolTip($CopyDeleteFileBox, "If checked, program will delete temp HTML file that is stored in users temp folder 10 seconds after it opens it.
+If not checked the file will not be deleted, but the next time the program is run it will overwrite the old file.")
 
 
 
@@ -1586,6 +1605,7 @@ $form1.Controls.Add($CopyExistingUserBox)
 $form1.Controls.Add($CopyNetNewUserBox)
 $form1.Controls.Add($CopyOverwriteGroupsBox)
 $form1.Controls.Add($CopyOverwritePropertiesBox)
+$form1.Controls.Add($CopyDeleteFileBox)
 
 $form1.Controls.Add($SearchButton)
 #display the form
