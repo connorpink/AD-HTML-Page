@@ -844,7 +844,7 @@ function GenerateFileCompare {
     Start-Process C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
 
     #remove file if box is checked
-    if ($CopyDeleteFileBox.Checked = $true)
+    if ($DeleteBoxChecked -eq $true)
     {
         Start-Sleep -s 10
         Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
@@ -974,16 +974,7 @@ Function Searching {
                         try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}
                         
 
-                        #change new user OU location
-    
-                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
-    
-                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
-    
-                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
-    
-                       
+                        
     
                         #Copy Groups over
                         $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
@@ -998,6 +989,16 @@ Function Searching {
                             }
                         }
     
+                        #change new user OU location
+    
+                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+    
+                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
+                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
+    
+                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
+    
+                       
                         #At the end generate a file of a comparison of new user compared to old user
                         #to show that new user is idenitical to old
     
@@ -1210,7 +1211,6 @@ Function Searching {
 
 
                     while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                        Write-Host $existingUserGroupList
                         try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
                         Start-Sleep -Seconds 2
                     }
@@ -1517,9 +1517,16 @@ $CopyDeleteFileBox.location = New-Object System.Drawing.size(420, 60)
 $CopyDeleteFileBox.size = New-Object System.Drawing.size(190, 30)
 $CopyDeleteFileBox.Checked = $false
 $CopyDeleteFileBox.text = "delete temp file after..."
-
 $CopyDeleteFileBox.Font = 'Microsoft Sans Serif,9'
 $CopyDeleteFileBox.Name = "CopyDeleteFileBox"
+$CopyDeleteFileBox.add_CheckedChanged({
+    if ($CopyDeleteFileBox.Checked -eq $true) {
+        $DeleteBoxChecked = $true
+    }
+    if ($CopyDeleteFileBox.Checked -eq $false) {
+        $DeleteBoxChecked = $false
+    }
+})
 
 
 #label for search second bar
@@ -1627,7 +1634,7 @@ If not checked the file will not be deleted, but the next time the program is ru
 
 $form1.Controls.Add($Search)
 $form1.Controls.Add($SearchBox)
-$form1.Controls.Add($darkButtonBox)
+
 
 $form1.Controls.Add($CompareSearchBox)
 $form1.Controls.Add($CompareSearch)
@@ -1649,7 +1656,7 @@ $form1.Controls.Add($CopyNetNewUserBox)
 $form1.Controls.Add($CopyOverwriteGroupsBox)
 $form1.Controls.Add($CopyOverwritePropertiesBox)
 $form1.Controls.Add($CopyDeleteFileBox)
-
+$form1.Controls.Add($darkButtonBox)
 $form1.Controls.Add($SearchButton)
 #display the form
 $form1.ShowDialog() | out-null
