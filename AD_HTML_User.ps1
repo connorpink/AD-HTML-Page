@@ -1288,7 +1288,7 @@ Function NewExistingSearchBarCopy {
     $CopyUserNameBox.Visible = $true
     
     #change text of label and button
-    $Search.Text = "Enter the username of the account you would like to copy from:"
+    $Search.Text = "Enter the username of the account to copy from:"
     $SearchButton.Text = "Copy"
     $form1.Refresh()
 
@@ -1362,15 +1362,34 @@ Function NetNewAddCopy {
 #create a windows gui form data
 #form container
 $form1 = New-Object System.Windows.Forms.Form
-$form1.ClientSize = "560,290"
+$form1.ClientSize = "580,290"
 $form1.StartPosition = "CenterScreen"
-$form1.Text = "Searching For Users"
+$form1.Text = "Active Directory Extra Features"
+
+#dark mode button
+$darkButtonBox = New-Object System.Windows.Forms.CheckBox
+$darkButtonBox.Location = New-Object System.Drawing.size(530, 15)
+$darkButtonBox.size = New-Object System.Drawing.size(40, 20)
+$darkButtonBox.Text = "Dark"
+$darkButtonBox.Font = 'Microsoft Sans Serif,9'
+$darkButtonBox.Appearance = 'button'
+$darkButtonBox.add_CheckedChanged({
+    if ($darkButtonBox.Checked -eq $true) {
+        DarkMode
+    }
+    if ($darkButtonBox.Checked -eq $false) {
+        LightMode
+    }
+})
+
+
 
 #label for search bar
 $Search = New-Object System.Windows.Forms.Label
 $Search.Size = New-Object System.Drawing.size(140, 40)
 $Search.Location = New-Object System.Drawing.size(20, 20)
 $Search.Text = "Enter an Accounts Username:"
+$Search.Font = 'Microsoft Sans Serif,9'
 
 #text box for user to type in user's name
 $SearchBox = New-Object System.Windows.Forms.TextBox
@@ -1384,6 +1403,8 @@ $SearchButton.Size = New-Object System.Drawing.Size(100, 40)
 $SearchButton.Location = New-Object System.Drawing.Size(420, 20)
 #listener for if button is clicked, run the Searching function
 $SearchButton.Add_Click({ Searching })
+$SearchButton.Font = 'Microsoft Sans Serif,10'
+
 
 
 #label for search second bar
@@ -1392,6 +1413,7 @@ $CompareSearch.Size = New-Object System.Drawing.size(140, 40)
 $CompareSearch.Name = "CompareSearch"
 $CompareSearch.Location = New-Object System.Drawing.size(20, 70)
 $CompareSearch.Text = "Enter a second Account's Username:"
+$CompareSearch.Font = 'Microsoft Sans Serif,9'
 
 #comparison check box 
 $CompareBox = New-Object System.Windows.Forms.CheckBox
@@ -1399,6 +1421,8 @@ $CompareBox.location = New-Object System.Drawing.size(20, 200)
 $CompareBox.size = New-Object System.Drawing.size(180, 20)
 $CompareBox.Checked = $false
 $CompareBox.text = "Compare to another User..."
+$CompareBox.Font = 'Microsoft Sans Serif,10'
+
 $CompareBox.Name = "CompareBox"
 $CompareBox.add_CheckedChanged({
         if ($CompareBox.Checked -eq $true) {
@@ -1416,7 +1440,9 @@ $CopyExistingUserBox.location = New-Object System.Drawing.size(200, 200)
 $CopyExistingUserBox.size = New-Object System.Drawing.size(180, 20)
 $CopyExistingUserBox.Checked = $false
 $CopyExistingUserBox.text = "Copy to another User..."
+$CopyExistingUserBox.Font = 'Microsoft Sans Serif,10'
 $CopyExistingUserBox.Name = "CopyNewUserBox"
+
 $CopyExistingUserBox.add_CheckedChanged({
         if ($CopyExistingUserBox.Checked -eq $true) {
             NewExistingSearchBarCopy
@@ -1428,11 +1454,13 @@ $CopyExistingUserBox.add_CheckedChanged({
 #copy to net new user checkbox
 #Copy check box 
 $CopyNetNewUserBox = New-Object System.Windows.Forms.CheckBox
-$CopyNetNewUserBox.location = New-Object System.Drawing.size(380, 170)
-$CopyNetNewUserBox.size = New-Object System.Drawing.size(180, 30)
+$CopyNetNewUserBox.location = New-Object System.Drawing.size(380, 165)
+$CopyNetNewUserBox.size = New-Object System.Drawing.size(180, 35)
 $CopyNetNewUserBox.Checked = $false
 $CopyNetNewUserBox.Visible = $false
 $CopyNetNewUserBox.text = "Net New User.... "
+$CopyNetNewUserBox.Font = 'Microsoft Sans Serif,10'
+
 $CopyNetNewUserBox.Name = "CopyNewUserBox"
 $CopyNetNewUserBox.add_CheckedChanged({
         if ($CopyNetNewUserBox.Checked -eq $true) {
@@ -1448,10 +1476,12 @@ $CopyNetNewUserBox.add_CheckedChanged({
 #overwrite member of groups
 $CopyOverwriteGroupsBox = New-Object System.Windows.Forms.CheckBox
 $CopyOverwriteGroupsBox.location = New-Object System.Drawing.size(380, 200)
-$CopyOverwriteGroupsBox.size = New-Object System.Drawing.size(180, 30)
+$CopyOverwriteGroupsBox.size = New-Object System.Drawing.size(200, 35)
 $CopyOverwriteGroupsBox.Checked = $false
 $CopyOverwriteGroupsBox.Visible = $false
 $CopyOverwriteGroupsBox.text = "Overwrite current users 'member of' security groups "
+$CopyOverwriteGroupsBox.Font = 'Microsoft Sans Serif,10'
+
 $CopyOverwriteGroupsBox.Name = "CopyNewUserBox"
 $CopyOverwriteGroupsBox.add_CheckedChanged({
         if ($CopyOverwriteGroupsBox.Checked -eq $true) {
@@ -1464,11 +1494,13 @@ $CopyOverwriteGroupsBox.add_CheckedChanged({
 
 #overwrite member of groups
 $CopyOverwritePropertiesBox = New-Object System.Windows.Forms.CheckBox
-$CopyOverwritePropertiesBox.location = New-Object System.Drawing.size(380, 230)
-$CopyOverwritePropertiesBox.size = New-Object System.Drawing.size(190, 30)
+$CopyOverwritePropertiesBox.location = New-Object System.Drawing.size(380, 235)
+$CopyOverwritePropertiesBox.size = New-Object System.Drawing.size(190, 35)
 $CopyOverwritePropertiesBox.Checked = $false
 $CopyOverwritePropertiesBox.Visible = $false
 $CopyOverwritePropertiesBox.text = "Overwrite user's properties and OU"
+$CopyOverwritePropertiesBox.Font = 'Microsoft Sans Serif,10'
+
 $CopyOverwritePropertiesBox.Name = "CopyNewUserBox"
 $CopyOverwritePropertiesBox.add_CheckedChanged({
         if ($CopyOverwritePropertiesBox.Checked -eq $true) {
@@ -1485,6 +1517,8 @@ $CopyDeleteFileBox.location = New-Object System.Drawing.size(420, 60)
 $CopyDeleteFileBox.size = New-Object System.Drawing.size(190, 30)
 $CopyDeleteFileBox.Checked = $false
 $CopyDeleteFileBox.text = "delete temp file after..."
+
+$CopyDeleteFileBox.Font = 'Microsoft Sans Serif,9'
 $CopyDeleteFileBox.Name = "CopyDeleteFileBox"
 
 
@@ -1494,6 +1528,8 @@ $CompareSearch.Size = New-Object System.Drawing.size(140, 40)
 $CompareSearch.Name = "CompareSearch"
 $CompareSearch.Location = New-Object System.Drawing.size(20, 70)
 $CompareSearch.Text = "Enter a second Account's Username:"
+
+$CompareSearch.Font = 'Microsoft Sans Serif,9'
 $CompareSearch.Visible = $false
 
 #text box for user to type in user's name
@@ -1513,7 +1549,9 @@ $CopyFirstName = New-Object System.Windows.Forms.Label
 $CopyFirstName.Size = New-Object System.Drawing.size(140, 40)
 $CopyFirstName.Name = "CopySearch"
 $CopyFirstName.Location = New-Object System.Drawing.size(20, 100)
-$CopyFirstName.Text = "Enter new account first name"
+$CopyFirstName.Text = "Enter new acc ount first name"
+$CopyFirstName.Font = 'Microsoft Sans Serif,9'
+
 $CopyFirstName.Visible = $false
 
 #text box for Name to type in Name's name
@@ -1530,6 +1568,8 @@ $CopyLastName.Size = New-Object System.Drawing.size(140, 40)
 $CopyLastName.Name = "CopySearch"
 $CopyLastName.Location = New-Object System.Drawing.size(20, 140)
 $CopyLastName.Text = "Enter new account Last name"
+$CopyLastName.Font = 'Microsoft Sans Serif,9'
+
 $CopyLastName.Visible = $false
 
 #text box for Name to type in Name's name
@@ -1539,12 +1579,15 @@ $CopyLastNameBox.Size = New-Object System.Drawing.Size(240, 70)
 $CopyLastNameBox.Name = "CopyLastNameBox"
 $CopyLastNameBox.Visible = $false
 
+
 #label for search Last bar
 $CopyUserName = New-Object System.Windows.Forms.Label
 $CopyUserName.Size = New-Object System.Drawing.size(140, 40)
 $CopyUserName.Name = "CopySearch"
 $CopyUserName.Location = New-Object System.Drawing.size(20, 60)
 $CopyUserName.Text = "Enter account User name to copy to"
+$CopyUserName.Font = 'Microsoft Sans Serif,9'
+
 $CopyUserName.Visible = $false
 
 #text box for Name to type in Name's name  
@@ -1582,9 +1625,9 @@ If not checked the file will not be deleted, but the next time the program is ru
 
 
 
-
 $form1.Controls.Add($Search)
 $form1.Controls.Add($SearchBox)
+$form1.Controls.Add($darkButtonBox)
 
 $form1.Controls.Add($CompareSearchBox)
 $form1.Controls.Add($CompareSearch)
@@ -1612,3 +1655,68 @@ $form1.Controls.Add($SearchButton)
 $form1.ShowDialog() | out-null
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
+Function DarkMode{
+    $grey = '#484848' 
+    $black = '#2b2a2a' 
+    $white = '#ffffff'
+    $form1.BackColor = $black
+    $Search.ForeColor = $white
+    $SearchBox.BackColor = $grey
+    $SearchBox.ForeColor = $white
+    $SearchButton.ForeColor = $white
+    $CompareSearch.ForeColor = $white
+    $CompareBox.ForeColor = $white
+    $CopyExistingUserBox.ForeColor = $white
+    $CopyNetNewUserBox.ForeColor = $white
+    $CopyOverwriteGroupsBox.ForeColor = $white
+    $CopyOverwritePropertiesBox.ForeColor = $white
+    $CopyDeleteFileBox.ForeColor = $white
+    $CompareSearch.ForeColor = $white
+    $CompareSearchBox.BackColor = $grey
+    $CompareSearchBox.ForeColor = $white
+    $CopyFirstName.ForeColor = $white
+    $CopyFirstNameBox.BackColor = $grey
+    $CopyFirstNameBox.ForeColor = $white
+    $CopyLastName.ForeColor = $white
+    $CopyLastNameBox.BackColor = $grey
+    $CopyLastNameBox.ForeColor = $white
+    $CopyUserName.ForeColor = $white
+    $CopyUserNameBox.BackColor = $grey
+    $CopyUserNameBox.ForeColor = $white
+    $darkButtonBox.ForeColor = $white
+
+    
+
+}
+Function LightMode{
+    $black = '#202020' 
+    $white = '#ffffff'
+    $offWhite = '#f0f0f0'
+    $form1.BackColor = $offWhite
+    $Search.ForeColor = $black
+    $SearchBox.BackColor = $white
+    $SearchBox.ForeColor = $black
+    $SearchButton.ForeColor = $black
+    $CompareSearch.ForeColor = $black
+    $CompareBox.ForeColor = $black
+    $CopyExistingUserBox.ForeColor = $black
+    $CopyNetNewUserBox.ForeColor = $black
+    $CopyOverwriteGroupsBox.ForeColor = $black
+    $CopyOverwritePropertiesBox.ForeColor = $black
+    $CopyDeleteFileBox.ForeColor = $black
+    $CompareSearch.ForeColor = $black
+    $CompareSearchBox.BackColor = $white
+    $CompareSearchBox.ForeColor = $black
+    $CopyFirstName.ForeColor = $black
+    $CopyFirstNameBox.BackColor = $white
+    $CopyFirstNameBox.ForeColor = $black
+    $CopyLastName.ForeColor = $black
+    $CopyLastNameBox.BackColor = $white
+    $CopyLastNameBox.ForeColor = $black
+    $CopyUserName.ForeColor = $black
+    $CopyUserNameBox.BackColor = $white
+    $CopyUserNameBox.ForeColor = $black
+    $darkButtonBox.ForeColor = $black
+
+    
+}
