@@ -309,7 +309,7 @@ function GenerateFile {
 
     }
      
-    $Groups = Get-ADPrincipalGroupMembership -Credential $cred -Identity $DesiredUser | Select-Object Name 
+    $Groups = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $DesiredUser | Select-Object Name 
 
     $assignToPostContent += "<div class='allInfo'>"
     if ($User_Name) { $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $User_Name + "</h2></div>" }
@@ -779,12 +779,12 @@ function GenerateFileCompare {
     $SecondUserNotEqual = @()
     
     
-    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $FirstUser | Select-Object Name
+    $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $FirstUser | Select-Object Name
     Foreach ($y IN $d) {
         $FirstUserList += $y.name
     }
 
-    $e = Get-ADPrincipalGroupMembership -Credential $cred -Identity $SecondUser | Select-Object Name
+    $e = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $SecondUser | Select-Object Name
     Foreach ($y IN $e) {
         $SecondUserList += $y.name
     }
@@ -986,7 +986,7 @@ Function Searching {
                     Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
 
                     #Copy Groups over
-                    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Select-Object Name
+                    $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
                     Foreach ($g IN $d) {
                         if ($g.name -ne 'Domain Users') {
                             try {
@@ -1007,7 +1007,7 @@ Function Searching {
                     
                     while ($CheckArray.Length -ne ($d.Length - $counter)) { 
                         try{
-                        $CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $newUserUserName | Select-Object Name
+                        $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
                         }
                         catch{
                             
@@ -1042,7 +1042,7 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
                      
                          #remove old groups?
-                        Get-AdPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                        Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
                     
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
                         $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
@@ -1061,7 +1061,7 @@ Function Searching {
                         
     
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Select-Object Name
+                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
                                 try {
@@ -1093,7 +1093,7 @@ Function Searching {
     
                         while ($CheckArray.Length -ne ($d.Length - $counter)) { 
 
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
     
@@ -1127,10 +1127,10 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
     
                         #remove old groups
-                        Get-AdPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                        Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
 
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         Foreach ($g IN $d) {
                             try {
                                 Add-ADGroupMember -Credential $cred -Identity $g.name -Members $newUserUserName
@@ -1148,7 +1148,7 @@ Function Searching {
     
                         
                         while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
-                            $CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $newUserUserName | Select-Object Name
+                            $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
                             Start-Sleep -Seconds 2
                         }
     
@@ -1203,8 +1203,8 @@ Function Searching {
                         #dont remove old groups
     
                         #Copy Groups over
-                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object -ExpandProperty Name
-                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                        $existingUserGroupList = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object -ExpandProperty Name
+                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         $alreadyThereCounter = 0
                         $counter = 0
                         Foreach ($g IN $d) {
@@ -1234,7 +1234,7 @@ Function Searching {
                         $CheckArray = @()
     
                         while ((($CheckArray.Length)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
     
@@ -1268,8 +1268,8 @@ Function Searching {
                     
                     #Append Groups over
 
-                    $existingUserGroupList = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
-                    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
+                    $existingUserGroupList = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
+                    $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
                     $alreadyThereCounter = 0
                     $counter = 0
                     Foreach ($g IN $d) {
@@ -1295,7 +1295,7 @@ Function Searching {
 
 
                     while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                        try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
+                        try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                         Start-Sleep -Seconds 2
                     }
 
