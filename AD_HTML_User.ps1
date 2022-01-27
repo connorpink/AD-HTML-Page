@@ -1,6 +1,16 @@
 import-module ActiveDirectory
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
+while ($domain.name -eq $null){
+    if($cred = $host.ui.PromptForCredential('Need credentials', 'Please enter your user name and password.',
+    'PRHC01\', "SYSTEM\Administrator")){}else{exit}
+    $username = $cred.username
+    try{$password = $cred.GetNetworkCredential().password} catch{}
+
+    # Get current domain using logged-on user's credentials
+    $CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
+    $domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
+}
 
 Function DarkMode{
     $grey = '#484848' 
@@ -226,80 +236,80 @@ function GenerateFile {
     #querry the users information from Active Directory
 
     try {
-        $User_Desc = Get-ADUser -Identity $DesiredUser -Properties Description |
+        $User_Desc = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     }
     try {
-        $User_Name = Get-ADUser -Identity $DesiredUser -Properties Name |
+        $User_Name = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     }
     try {
-        $User_Email = Get-ADUser -Identity $DesiredUser -Properties EmailAddress |
+        $User_Email = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     }
     try {
-        $User_FullName = Get-ADUser -Identity $DesiredUser -Properties DisplayName |
+        $User_FullName = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     }
     try {
-        $User_Department = Get-ADUser -Identity $DesiredUser -Properties Department |
+        $User_Department = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     }
     try {
-        $User_Company = Get-ADUser -Identity $DesiredUser -Properties Company |
+        $User_Company = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     }
     try {
-        $User_JobTitle = Get-ADUser -Identity $DesiredUser -Properties Title |
+        $User_JobTitle = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     }  try {
-        $User_Office = Get-ADUser -Identity $DesiredUser -Properties office |
+        $User_Office = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     }  try {
-        $User_Phone = Get-ADUser -Identity $DesiredUser -Properties telephoneNumber |
+        $User_Phone = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
    
     }  try {
-        $User_ManagerTemp = Get-ADUser -Identity $DesiredUser -Properties Manager |
+        $User_ManagerTemp = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     }  try {
-        $User_Manager = Get-ADUser -Identity $User_ManagerTemp -Properties DisplayName |
+        $User_Manager = Get-ADUser -Credential $cred -Identity $User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     }
      
-    $Groups = Get-ADPrincipalGroupMembership -Identity $DesiredUser | Select-Object Name 
+    $Groups = Get-ADPrincipalGroupMembership -Credential $cred -Identity $DesiredUser | Select-Object Name 
 
     $assignToPostContent += "<div class='allInfo'>"
     if ($User_Name) { $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $User_Name + "</h2></div>" }
@@ -561,67 +571,67 @@ function GenerateFileCompare {
     
     #querry the users information from Active Directory for the First User
     try {
-        $First_User_Desc = Get-ADUser -Identity $FirstUser -Properties Description |
+        $First_User_Desc = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     } try {
-        $First_User_Name = Get-ADUser -Identity $FirstUser -Properties Name |
+        $First_User_Name = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     } try {
-        $First_User_Email = Get-ADUser -Identity $FirstUser -Properties EmailAddress |
+        $First_User_Email = Get-ADUser -Credential $cred -Identity $FirstUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     } try {
-        $First_User_FullName = Get-ADUser -Identity $FirstUser -Properties DisplayName |
+        $First_User_FullName = Get-ADUser -Credential $cred -Identity $FirstUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     } try {
-        $First_User_Department = Get-ADUser -Identity $FirstUser -Properties Department |
+        $First_User_Department = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     } try {
-        $First_User_Company = Get-ADUser -Identity $FirstUser -Properties Company |
+        $First_User_Company = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     } try {
-        $First_User_JobTitle = Get-ADUser -Identity $FirstUser -Properties Title |
+        $First_User_JobTitle = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     } try {
-        $First_User_Office = Get-ADUser -Identity $FirstUser -Properties office |
+        $First_User_Office = Get-ADUser -Credential $cred -Identity $FirstUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     } try {
-        $First_User_Phone = Get-ADUser -Identity $FirstUser -Properties telephoneNumber |
+        $First_User_Phone = Get-ADUser -Credential $cred -Identity $FirstUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
 
     } try {
-        $First_User_ManagerTemp = Get-ADUser -Identity $FirstUser -Properties Manager |
+        $First_User_ManagerTemp = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     } try {
-        $First_User_Manager = Get-ADUser -Identity $First_User_ManagerTemp -Properties DisplayName |
+        $First_User_Manager = Get-ADUser -Credential $cred -Identity $First_User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
@@ -634,77 +644,77 @@ function GenerateFileCompare {
     #$assignToPostContent += "<div class = 'secondUser'>"
     
     try {
-        $Second_User_Desc = Get-ADUser -Identity $SecondUser -Properties Description |
+        $Second_User_Desc = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     } try {
 
-        $Second_User_Name = Get-ADUser -Identity $SecondUser -Properties Name |
+        $Second_User_Name = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     } try {
 
-        $Second_User_Email = Get-ADUser -Identity $SecondUser -Properties EmailAddress |
+        $Second_User_Email = Get-ADUser -Credential $cred -Identity $SecondUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     } try {
 
-        $Second_User_FullName = Get-ADUser -Identity $SecondUser -Properties DisplayName |
+        $Second_User_FullName = Get-ADUser -Credential $cred -Identity $SecondUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     } try {
 
-        $Second_User_Department = Get-ADUser -Identity $SecondUser -Properties Department |
+        $Second_User_Department = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     } try {
 
-        $Second_User_Company = Get-ADUser -Identity $SecondUser -Properties Company |
+        $Second_User_Company = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     } try {
 
-        $Second_User_JobTitle = Get-ADUser -Identity $SecondUser -Properties Title |
+        $Second_User_JobTitle = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     } try {
 
-        $Second_User_Office = Get-ADUser -Identity $SecondUser -Properties office |
+        $Second_User_Office = Get-ADUser -Credential $cred -Identity $SecondUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     } try {
 
-        $Second_User_Phone = Get-ADUser -Identity $SecondUser -Properties telephoneNumber |
+        $Second_User_Phone = Get-ADUser -Credential $cred -Identity $SecondUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
 
     } try {
 
-        $Second_User_ManagerTemp = Get-ADUser -Identity $SecondUser -Properties Manager |
+        $Second_User_ManagerTemp = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     } try {
 
-        $Second_User_Manager = Get-ADUser -Identity $Second_User_ManagerTemp -Properties DisplayName |
+        $Second_User_Manager = Get-ADUser -Credential $cred -Identity $Second_User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
@@ -769,12 +779,12 @@ function GenerateFileCompare {
     $SecondUserNotEqual = @()
     
     
-    $d = Get-ADPrincipalGroupMembership -Identity $FirstUser | Select-Object Name
+    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $FirstUser | Select-Object Name
     Foreach ($y IN $d) {
         $FirstUserList += $y.name
     }
 
-    $e = Get-ADPrincipalGroupMembership -Identity $SecondUser | Select-Object Name
+    $e = Get-ADPrincipalGroupMembership -Credential $cred -Identity $SecondUser | Select-Object Name
     Foreach ($y IN $e) {
         $SecondUserList += $y.name
     }
@@ -925,7 +935,15 @@ function Test-ADUser {
         [Parameter(Mandatory = $true)]
         [String] $sAMAccountName
     )
-    $null -ne ([ADSISearcher] "(sAMAccountName=$sAMAccountName)").FindOne()
+
+    try {
+        Get-ADUser -Identity $sAMAccountName
+        $UserExists = $true
+    }
+    catch {
+        $UserExists = $false
+    }
+    return $UserExists
 }
 
 
@@ -952,27 +970,27 @@ Function Searching {
                     $newUserDisplayName = $newUserLastName + ", " + $newUserFirstName
                     
                     #retrieve info from oldUser such as description, department, member of,  security... etc 
-                    $user = Get-ADUser $oldUser -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
+                    $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
                     
                     #create new user with firstName, lastName, userName, email and everything else
                     
-                    New-ADUser -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
+                    New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
 
                     #change new user OU location
 
-                    $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+                    $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
 
                     $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                    $UserDN2 = (Get-ADUser -Identity $newUserUserName).distinguishedName
+                    $UserDN2 = (Get-ADUser -Credential $cred -Identity $newUserUserName).distinguishedName
 
-                    Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
+                    Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
 
                     #Copy Groups over
-                    $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Select-Object Name
                     Foreach ($g IN $d) {
                         if ($g.name -ne 'Domain Users') {
                             try {
-                                Add-ADGroupMember -Identity $g.name -Members $newUserUserName
+                                Add-ADGroupMember -Credential $cred -Identity $g.name -Members $newUserUserName
                             }
                             catch {
                                 $counter += 1
@@ -989,7 +1007,7 @@ Function Searching {
                     
                     while ($CheckArray.Length -ne ($d.Length - $counter)) { 
                         try{
-                        $CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name
+                        $CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $newUserUserName | Select-Object Name
                         }
                         catch{
                             
@@ -1024,30 +1042,30 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
                      
                          #remove old groups?
-                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                        Get-AdPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
                     
                         #retrieve info from oldUser such as description, department, member of,  security... etc 
-                        $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
+                        $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
                     
                         #modify eisting user information using $existingUserUserName
-                        try{Set-ADUser -Identity $existingUserUserName -Description $user.Description} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Department $user.Department} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Manager $user.Manager} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Title $user.Title} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -office $user.office} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -organization $user.organization} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
                         
 
                         
     
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Select-Object Name
+                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Select-Object Name
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
                                 try {
-                                    Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
+                                    Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
                                 }
                                 catch {
                                     $counter += 1
@@ -1057,12 +1075,12 @@ Function Searching {
     
                         #change new user OU location
     
-                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+                        $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
     
                         $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
+                        $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
     
-                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
+                        Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
     
                        
                         #At the end generate a file of a comparison of new user compared to old user
@@ -1075,7 +1093,7 @@ Function Searching {
     
                         while ($CheckArray.Length -ne ($d.Length - $counter)) { 
 
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
     
@@ -1109,13 +1127,13 @@ Function Searching {
                         $existingUserUserName = $CopyUserNameBox.Text
     
                         #remove old groups
-                        Get-AdPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                        Get-AdPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
 
                         #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         Foreach ($g IN $d) {
                             try {
-                                Add-ADGroupMember -Identity $g.name -Members $newUserUserName
+                                Add-ADGroupMember -Credential $cred -Identity $g.name -Members $newUserUserName
                             }
                             catch {
                                 $counter += 1
@@ -1130,7 +1148,7 @@ Function Searching {
     
                         
                         while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
-                            $CheckArray = Get-ADPrincipalGroupMembership -Identity $newUserUserName | Select-Object Name
+                            $CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $newUserUserName | Select-Object Name
                             Start-Sleep -Seconds 2
                         }
     
@@ -1171,22 +1189,22 @@ Function Searching {
                         $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
                     
                         #modify eisting user information using $existingUserUserName
-                        try{Set-ADUser -Identity $existingUserUserName -Description $user.Description} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Department $user.Department} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Manager $user.Manager} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Title $user.Title} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -office $user.office} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -organization $user.organization} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
-                        try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
 
                         
     
                         #dont remove old groups
     
                         #Copy Groups over
-                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object -ExpandProperty Name
-                        $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                        $existingUserGroupList = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object -ExpandProperty Name
+                        $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         $alreadyThereCounter = 0
                         $counter = 0
                         Foreach ($g IN $d) {
@@ -1194,7 +1212,7 @@ Function Searching {
                                 if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
                                 else{
                                     try {
-                                        Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
+                                        Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
                                     }
                                     catch {
                                         $counter += 1
@@ -1204,19 +1222,19 @@ Function Searching {
                         }
                         #change new user OU location
                         
-                        $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+                        $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
                         
                         $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                        $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
+                        $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
 
-                        Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
+                        Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
                         #At the end generate a file of a comparison of new user compared to old user
                         #to show that new user is idenitical to old
     
                         $CheckArray = @()
     
                         while ((($CheckArray.Length)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                             Start-Sleep -Seconds 2
                         }
     
@@ -1250,8 +1268,8 @@ Function Searching {
                     
                     #Append Groups over
 
-                    $existingUserGroupList = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
-                    $d = Get-ADPrincipalGroupMembership -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
+                    $existingUserGroupList = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
+                    $d = Get-ADPrincipalGroupMembership -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
                     $alreadyThereCounter = 0
                     $counter = 0
                     Foreach ($g IN $d) {
@@ -1259,7 +1277,7 @@ Function Searching {
                             if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
                             else{
                                 try {
-                                    Add-ADGroupMember -Identity $g.name -Members $existingUserUserName
+                                    Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
                                 }
                                 catch {
                                     $counter += 1
@@ -1277,7 +1295,7 @@ Function Searching {
 
 
                     while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                        try{$CheckArray = Get-ADPrincipalGroupMembership -Identity $existingUserUserName | Select-Object Name} catch{}
+                        try{$CheckArray = Get-ADPrincipalGroupMembership -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                         Start-Sleep -Seconds 2
                     }
 
