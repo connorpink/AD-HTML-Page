@@ -22,6 +22,6 @@ The program is written in powershell and converted into a executable file. The p
 
 # Extra features.
 ![Screenshot](screenshot2.jpg)
-- optionally delte the generated HTML file that is stored in the user's temp folder location after 10 seconds to prevent clutter.
+- optionally delete the generated HTML file that is stored in the user's temp folder location after 10 seconds to prevent clutter.
 
 - An included dark-mode button.
