@@ -3,7 +3,7 @@ Active Directory HTML page.
 This program was made for the IT department at PRHC hospital as a tool to provide easy access to processes that are not available in Active Directory and take a long time to comeplete manually.
 The program is written in powershell and converted into a executable file. The program requires administrator privileges and prompts the user to login when launched. Through this the program can run the commands under the credentials of whatever user is desired.
 
-![Screenshot](Screenshot.jpg)
+![Screenshot](screenshot.jpg)
 ## It allows the following features.  
 - Enter an accounts username to look them up and generate an HTML file that is opened that illustrates all the useful information that a unique user has at PRHC. 
 
@@ -18,7 +18,7 @@ The program is written in powershell and converted into a executable file. The p
 - The final main function is to generate a net new user. This feature takes the username of the old and new user. The old user must exist and the new one does not yet. It also takes the first and last name of the user manually to prevent duplicates. It then generates and email and creates the user with the same properties security groups and location as the old user.
 
 # Extra features.
-![Screenshot](Screenshot2.jpg)
+![Screenshot](screenshot2.jpg)
 - optionally delte the generated HTML file that is stored in the user's temp folder location after 10 seconds to prevent clutter.
 
 - An included dark-mode button.
