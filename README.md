@@ -16,6 +16,9 @@ The program is written in powershell and converted into a executable file. The p
 - Another option is to have the tool overwrite the other users properties. This means that the users department, office, manager, etc are overwrited as an easy way to for example move a user to a different department. This also moves the other user's OU location so in AD theyre location is the same as the copied from user. 
 
 - The final main function is to generate a net new user. This feature takes the username of the old and new user. The old user must exist and the new one does not yet. It also takes the first and last name of the user manually to prevent duplicates. It then generates and email and creates the user with the same properties security groups and location as the old user.
+  
+### Sample HTML Page
+![Screenshot](screenshot3.jpg)
 
 # Extra features.
 ![Screenshot](screenshot2.jpg)
