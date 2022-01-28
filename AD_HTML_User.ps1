@@ -920,7 +920,7 @@ function GenerateFileCompare {
     Start-Process C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html
 
     #remove file if box is checked
-    if ($DeleteBoxChecked -eq $true)
+    if ($DeleteBox.Checked -eq $true)
     {
         Start-Sleep -s 10
         Remove-Item C:\Users\$env:USERNAME\AppData\Local\Temp\Show-User-Description.html -Force
