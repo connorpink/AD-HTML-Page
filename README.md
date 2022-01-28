@@ -25,3 +25,5 @@ The program is written in powershell and converted into a executable file. The p
 - optionally delete the generated HTML file that is stored in the user's temp folder location after 10 seconds to prevent clutter.
 
 - An included dark-mode button.
+
+Credits to Connor Pink and Jax Sutton
