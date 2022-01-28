@@ -370,15 +370,15 @@ function GenerateFile {
     
     #convert code to html file
     ConvertTo-Html @htmlParams |
-    Out-File %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html
+    Out-File %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html
     #open the html file
-    Start-Process %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html
+    Start-Process %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html
 
     #remove the file if box is checked 
     if ($CopyDeleteFileBox.Checked = $true)
     {
         Start-Sleep -s 5
-        Remove-Item %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html -Force
+        Remove-Item %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html -Force
     }
 }
 
@@ -915,15 +915,15 @@ function GenerateFileCompare {
     
     #convert code to html file
     ConvertTo-Html @htmlParams |
-    Out-File %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html
+    Out-File %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html
     #open the html file
-    Start-Process %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html
+    Start-Process %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html
 
     #remove file if box is checked
     if ($DeleteBox.Checked -eq $true)
     {
         Start-Sleep -s 10
-        Remove-Item %USERPROFILE%\AppData\Local\Temp\Show-User-Description.html -Force
+        Remove-Item %USERPROFILE%\../AppData\Local\Temp\Show-User-Description.html -Force
     }
 }
 
