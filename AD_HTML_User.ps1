@@ -990,7 +990,7 @@ Function Searching {
                     Foreach ($g IN $d) {
                         if ($g.name -ne 'Domain Users') {
                             try {
-                                Add-ADGroupMember -Credential $cred -Identity $g.name -Members $newUserUserName
+                                Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
                             }
                             catch {
                                 $counter += 1
@@ -1065,7 +1065,7 @@ Function Searching {
                         Foreach ($g IN $d) {
                             if ($g.name -ne 'Domain Users') {
                                 try {
-                                    Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
+                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
                                 }
                                 catch {
                                     $counter += 1
@@ -1133,7 +1133,7 @@ Function Searching {
                         $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
                         Foreach ($g IN $d) {
                             try {
-                                Add-ADGroupMember -Credential $cred -Identity $g.name -Members $newUserUserName
+                                Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
                             }
                             catch {
                                 $counter += 1
@@ -1212,7 +1212,7 @@ Function Searching {
                                 if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
                                 else{
                                     try {
-                                        Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
+                                        Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
                                     }
                                     catch {
                                         $counter += 1
@@ -1277,7 +1277,7 @@ Function Searching {
                             if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
                             else{
                                 try {
-                                    Add-ADGroupMember -Credential $cred -Identity $g.name -Members $existingUserUserName
+                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
                                 }
                                 catch {
                                     $counter += 1
