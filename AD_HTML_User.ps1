@@ -960,65 +960,75 @@ Function Searching {
                 if (Test-ADUser($newUserUserName)) {
                     [System.Windows.MessageBox]::Show('Attempted net new user lready exists')
                 }
-                else{
-                    $newUserFirstName = $CopyFirstNameBox.Text
-                    $newUserLastName = $CopyLastNameBox.Text
-                    
-                    #generate email
-                    $newUserEmail = $newUserUserName + "@prhc.on.ca"
-                    #generate displayName
-                    $newUserDisplayName = $newUserLastName + ", " + $newUserFirstName
-                    
-                    #retrieve info from oldUser such as description, department, member of,  security... etc 
-                    $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
-                    
-                    #create new user with firstName, lastName, userName, email and everything else
-                    
-                    New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
+                $title    = 'Net New User'
+                $question = 'Are you sure you want to proceed with Net New User Creation?'
 
-                    #change new user OU location
+                $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
 
-                    $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
+                $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                if ($decision -eq 0) { 
+                    else{
+                        $newUserFirstName = $CopyFirstNameBox.Text
+                        $newUserLastName = $CopyLastNameBox.Text
+                        
+                        #generate email
+                        $newUserEmail = $newUserUserName + "@prhc.on.ca"
+                        #generate displayName
+                        $newUserDisplayName = $newUserLastName + ", " + $newUserFirstName
+                        
+                        #retrieve info from oldUser such as description, department, member of,  security... etc 
+                        $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
+                        
+                        #create new user with firstName, lastName, userName, email and everything else
+                        
+                        New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
 
-                    $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                    $UserDN2 = (Get-ADUser -Credential $cred -Identity $newUserUserName).distinguishedName
+                        #change new user OU location
 
-                    Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
+                        $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
 
-                    #Copy Groups over
-                    $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
-                    Foreach ($g IN $d) {
-                        if ($g.name -ne 'Domain Users') {
-                            try {
-                                Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
+                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
+                        $UserDN2 = (Get-ADUser -Credential $cred -Identity $newUserUserName).distinguishedName
+
+                        Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
+
+                        #Copy Groups over
+                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
+                        Foreach ($g IN $d) {
+                            if ($g.name -ne 'Domain Users') {
+                                try {
+                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
+                                }
+                                catch {
+                                    $counter += 1
+                                }
                             }
-                            catch {
-                                $counter += 1
+                        }
+
+                        
+                        #small method to ensure that the new AD account exists and is online before trying to generate the account 
+                        
+
+                        $CheckArray = @()
+
+                        
+                        while ($CheckArray.Length -ne ($d.Length - $counter)) { 
+                            try{
+                            $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
                             }
+                            catch{
+                                
+                            }
+                            Start-Sleep -Seconds 2
                         }
+                        #At the end generate a file of a comparison of new user compared to old user
+                        #to show that new user is idenitical to old
+                        GenerateFileCompare $oldUser $newUserUserName
+
+                        
                     }
-
-                    
-                    #small method to ensure that the new AD account exists and is online before trying to generate the account 
-                    
-
-                    $CheckArray = @()
-
-                    
-                    while ($CheckArray.Length -ne ($d.Length - $counter)) { 
-                        try{
-                        $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
-                        }
-                        catch{
-                            
-                        }
-                        Start-Sleep -Seconds 2
-                    }
-                    #At the end generate a file of a comparison of new user compared to old user
-                    #to show that new user is idenitical to old
-                    GenerateFileCompare $oldUser $newUserUserName
-
-                    
                 }
             }
             else {
@@ -1034,73 +1044,81 @@ Function Searching {
                 if (Test-ADUser($oldUser)) {
                     #if new user exists
                     if (Test-ADUser($newUserUserName)) {
-    
-    
-                        #add functionality here ---------------
-                        $oldUser = $SearchBox.Text
-                     
-                        $existingUserUserName = $CopyUserNameBox.Text
-                     
-                         #remove old groups?
-                        Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
-                    
-                        #retrieve info from oldUser such as description, department, member of,  security... etc 
-                        $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
-                    
-                        #modify eisting user information using $existingUserUserName
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
-                        try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
-                        
+                        $title    = 'Overwrite Member of groups and properties'
+                        $question = 'Are you sure you want to proceed?'
 
-                        
+                        $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+                        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                        if ($decision -eq 0) {
     
-                        #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
-                        Foreach ($g IN $d) {
-                            if ($g.name -ne 'Domain Users') {
-                                try {
-                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
-                                }
-                                catch {
-                                    $counter += 1
+                            #add functionality here ---------------
+                            $oldUser = $SearchBox.Text
+                        
+                            $existingUserUserName = $CopyUserNameBox.Text
+                        
+                            #remove old groups?
+                            Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                        
+                            #retrieve info from oldUser such as description, department, member of,  security... etc 
+                            $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
+                        
+                            #modify eisting user information using $existingUserUserName
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
+                            
+
+                            
+        
+                            #Copy Groups over
+                            $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Select-Object Name
+                            Foreach ($g IN $d) {
+                                if ($g.name -ne 'Domain Users') {
+                                    try {
+                                        Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
+                                    }
+                                    catch {
+                                        $counter += 1
+                                    }
                                 }
                             }
-                        }
+        
+                            #change new user OU location
+        
+                            $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
+        
+                            $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
+                            $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
+        
+                            Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
+        
+                        
+                            #At the end generate a file of a comparison of new user compared to old user
+                            #to show that new user is idenitical to old
+        
     
-                        #change new user OU location
-    
-                        $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
-    
-                        $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                        $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
-    
-                        Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
-    
-                       
-                        #At the end generate a file of a comparison of new user compared to old user
-                        #to show that new user is idenitical to old
-    
- 
-    
-                        $CheckArray = @()
-    
-    
-                        while ($CheckArray.Length -ne ($d.Length - $counter)) { 
+        
+                            $CheckArray = @()
+        
+        
+                            while ($CheckArray.Length -ne ($d.Length - $counter)) { 
 
-                            try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
-                            Start-Sleep -Seconds 2
+                                try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
+                                Start-Sleep -Seconds 2
+                            }
+        
+        
+                            #Start-Sleep -s 17
+                            GenerateFileCompare $oldUser $newUserUserName
                         }
-    
-    
-                        #Start-Sleep -s 17
-                        GenerateFileCompare $oldUser $newUserUserName
-
                     }
                     #new user  does not exist
                     else {
@@ -1117,49 +1135,53 @@ Function Searching {
                 #if old user exists
                 if (Test-ADUser($oldUser)) {
                     #if new user exists
-                    if (Test-ADUser($newUserUserName)) {
-                        #[System.Windows.MessageBox]::Show('selected username of new  User is already taken') 
-    
-    
-                        #add functionality here ---------------
-                        $oldUser = $SearchBox.Text
-                     
-                        $existingUserUserName = $CopyUserNameBox.Text
-    
-                        #remove old groups
-                        Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
-
-                        #Copy Groups over
-                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
-                        Foreach ($g IN $d) {
-                            try {
-                                Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
-                            }
-                            catch {
-                                $counter += 1
-                            }
-                        }
-    
-                        #At the end generate a file of a comparison of new user compared to old user
-                        #to show that new user is idenitical to old
-    
-    
-                        $CheckArray = @()
-    
+                    if (Test-ADUser($newUserUserName)) {    
+                        $title    = 'Overwrite Member of groups'
+                        $question = 'Are you sure you want to proceed?'
                         
-                        while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
-                            $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
-                            Start-Sleep -Seconds 2
-                        }
-    
-    
-    
-                        #Start-Sleep -s 17
-                        GenerateFileCompare $oldUser $newUserUserName
+                        $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+                        
+                        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                        if ($decision -eq 0) {
+                            
+                            #add functionality here ---------------
+                            $oldUser = $SearchBox.Text
+                        
+                            $existingUserUserName = $CopyUserNameBox.Text
+        
+                            #remove old groups
+                            Get-AdPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
 
-
-
-       
+                            #Copy Groups over
+                            $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
+                            Foreach ($g IN $d) {
+                                try {
+                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $newUserUserName
+                                }
+                                catch {
+                                    $counter += 1
+                                }
+                            }
+        
+                            #At the end generate a file of a comparison of new user compared to old user
+                            #to show that new user is idenitical to old
+        
+        
+                            $CheckArray = @()
+        
+                            
+                            while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
+                                $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $newUserUserName | Select-Object Name
+                                Start-Sleep -Seconds 2
+                            }
+        
+        
+        
+                            #Start-Sleep -s 17
+                            GenerateFileCompare $oldUser $newUserUserName
+                        }       
                     }
                     #if new user does not exist
                     else {
@@ -1179,7 +1201,16 @@ Function Searching {
             if (Test-ADUser($oldUser)) {
                 #if new user exists
                 if (Test-ADUser($newUserUserName)) {
+                    $title    = 'Copy Properties and append Member of groups'
+                    $question = 'Are you sure you want to proceed?'
 
+                    $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+                    $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                    if ($decision -eq 0) {
+                        
                         #add functionality here ---------------
                         $oldUser = $SearchBox.Text
                      
@@ -1240,9 +1271,7 @@ Function Searching {
     
                         #Start-Sleep -s 17
                         GenerateFileCompare $oldUser $existingUserUserName
-
-
-            
+                    }
                 }
                 #else new user does not exist throw error
                 else {
@@ -1261,48 +1290,56 @@ Function Searching {
             if (Test-ADUser($oldUser)) {
                 #if new user exists run code
                 if (Test-ADUser($newUserUserName)) {
-                    #add functionality here ---------------
-                    $oldUser = $SearchBox.Text
-                                        
-                    $existingUserUserName = $CopyUserNameBox.Text
-                    
-                    #Append Groups over
+                    $title    = 'Append Member of Groups to existing User'
+                    $question = 'Are you sure you want to proceed?'
 
-                    $existingUserGroupList = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
-                    $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
-                    $alreadyThereCounter = 0
-                    $counter = 0
-                    Foreach ($g IN $d) {
-                        if ($g.name -ne 'Domain Users') {
-                            if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
-                            else{
-                                try {
-                                    Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
-                                }
-                                catch {
-                                    $counter += 1
+                    $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+                    $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                    if ($decision -eq 0) {
+                        #add functionality here ---------------
+                        $oldUser = $SearchBox.Text
+                                            
+                        $existingUserUserName = $CopyUserNameBox.Text
+                        
+                        #Append Groups over
+
+                        $existingUserGroupList = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object -ExpandProperty Name
+                        $d = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value 'Domain Users' | Select-Object Name
+                        $alreadyThereCounter = 0
+                        $counter = 0
+                        Foreach ($g IN $d) {
+                            if ($g.name -ne 'Domain Users') {
+                                if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
+                                else{
+                                    try {
+                                        Add-ADGroupMember -Server 'DC01.prhc.on.ca' -Credential $cred -Identity $g.name -Members $existingUserUserName
+                                    }
+                                    catch {
+                                        $counter += 1
+                                    }
                                 }
                             }
                         }
+
+                        #At the end generate a file of a comparison of new user compared to old user
+                        #to show that new user is idenitical to old
+
+                        
+
+                        $CheckArray = @()
+
+
+                        while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
+                            try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
+                            Start-Sleep -Seconds 2
+                        }
+
+                        #Start-Sleep -s 17
+                        GenerateFileCompare $oldUser $existingUserUserName
                     }
-
-                    #At the end generate a file of a comparison of new user compared to old user
-                    #to show that new user is idenitical to old
-
-                    
-
-                    $CheckArray = @()
-
-
-                    while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                        try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer 'DC01.prhc.on.ca' -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
-                        Start-Sleep -Seconds 2
-                    }
-
-                    #Start-Sleep -s 17
-                    GenerateFileCompare $oldUser $existingUserUserName
-
-                
                 }
                #else new user does not exist throw error
                else {
