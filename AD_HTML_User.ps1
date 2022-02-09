@@ -964,7 +964,7 @@ Function Searching {
             if ($CopyNetNewUserBox.Checked -eq $true) {
                 if (Test-ADUser($oldUser)) {
                     if (Test-ADUser($newUserUserName)) {
-                        [System.Windows.MessageBox]::Show('Attempted net new user lready exists')
+                        [System.Windows.MessageBox]::Show('Attempted net new user already exists')
                     }
                     $title    = 'Net New User'
                     $question = 'Are you sure you want to proceed with Net New User Creation?'
@@ -1019,7 +1019,7 @@ Function Searching {
 
                             $CheckArray = @()
 
-                            
+                            [System.Windows.MessageBox]::Show('Success')
                             while ($CheckArray.Length -ne ($d.Length - $counter)) { 
                                 try{
                                 $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $newUserUserName | Select-Object Name
@@ -1029,6 +1029,7 @@ Function Searching {
                                 }
                                 Start-Sleep -Seconds 2
                             }
+                            
                             #At the end generate a file of a comparison of new user compared to old user
                             #to show that new user is idenitical to old
                             GenerateFileCompare $oldUser $newUserUserName
@@ -1114,7 +1115,7 @@ Function Searching {
             
                                 $CheckArray = @()
             
-            
+                                [System.Windows.MessageBox]::Show('Success')
                                 while ($CheckArray.Length -ne ($d.Length - $counter)) { 
 
                                     try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
@@ -1177,7 +1178,7 @@ Function Searching {
             
                                 $CheckArray = @()
             
-                                
+                                [System.Windows.MessageBox]::Show('Success')
                                 while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
                                     $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $newUserUserName | Select-Object Name
                                     Start-Sleep -Seconds 2
@@ -1269,12 +1270,11 @@ Function Searching {
                             #to show that new user is idenitical to old
         
                             $CheckArray = @()
-        
+                            [System.Windows.MessageBox]::Show('Success')
                             while ((($CheckArray.Length)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
                                 try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                                 Start-Sleep -Seconds 2
                             }
-        
                             #Start-Sleep -s 17
                             GenerateFileCompare $oldUser $existingUserUserName
                         }
@@ -1337,7 +1337,7 @@ Function Searching {
 
                             $CheckArray = @()
 
-
+                            [System.Windows.MessageBox]::Show('Success')
                             while ((($CheckArray.Length-1)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
                                 try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
                                 Start-Sleep -Seconds 2
@@ -1809,7 +1809,8 @@ $toolTip1.SetToolTip($CompareSearchBox, "Enter only the username of the user you
 $toolTip1.SetToolTip($CopyUserNameBox, "Enter only the username of the user you would like to copy to here.")
 $toolTip1.SetToolTip($CopyDeleteFileBox, "If checked, program will delete temp HTML file that is stored in users temp folder 10 seconds after it opens it.
 If not checked the file will not be deleted, but the next time the program is run it will overwrite the old file.")
-
+$toolTip1.SetToolTip($GroupTree1,"Group trees affect how the member of groups work and having the wrong one selected will the brick the program. Program is only successful if the HTML file is opened.")
+$toolTip1.SetToolTip($GroupTree2,"Group trees affect how the member of groups work and having the wrong one selected will the brick the program. Program is only successful if the HTML file is opened.")
 
 
 $form1.Controls.Add($Search)
