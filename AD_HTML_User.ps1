@@ -966,16 +966,17 @@ Function Searching {
                     if (Test-ADUser($newUserUserName)) {
                         [System.Windows.MessageBox]::Show('Attempted net new user already exists')
                     }
-                    $title    = 'Net New User'
-                    $question = 'Are you sure you want to proceed with Net New User Creation?'
+                    else{
 
-                    $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
-                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
-                    $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+                        $title    = 'Net New User'
+                        $question = 'Are you sure you want to proceed with Net New User Creation?'
 
-                    $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-                    if ($decision -eq 0) { 
-                        else{
+                        $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+                        $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+                        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+                        if ($decision -eq 0) { 
                             $newUserFirstName = $CopyFirstNameBox.Text
                             $newUserLastName = $CopyLastNameBox.Text
                             
@@ -1033,8 +1034,6 @@ Function Searching {
                             #At the end generate a file of a comparison of new user compared to old user
                             #to show that new user is idenitical to old
                             GenerateFileCompare $oldUser $newUserUserName
-
-                            
                         }
                     }
                 }
