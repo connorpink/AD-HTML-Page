@@ -990,7 +990,7 @@ Function Searching {
                             
                             #create new user with firstName, lastName, userName, email and everything else
                             
-                            New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "password" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
+                            New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "Password1" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
 
                             #change new user OU location
 
@@ -1793,7 +1793,8 @@ $toolTip1.SetToolTip($CopyExistingUserBox, "This box will by default take the me
 $toolTip1.SetToolTip($CopyNetNewUserBox, "Check this box to generate a new user that does not yet exist. User will have the 
 same Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, and
 Company as the old user, as well as the same Member of Groups and OU location. 
-The new user will need a unique username and name enterred by you so the email can be generated.")
+The new user will need a unique username and name enterred by you so the email can be generated. 
+The default new user password is 'Password1' and will prompt them to change it on login.")
 $toolTip1.SetToolTip($CopyOverwriteGroupsBox, "This will change the program function to overwrite the existing member-of groups of the user you are copying to as appossed to
 the default which is to append the groups")
 $toolTip1.SetToolTip($CopyOverwritePropertiesBox, "This will the change the program function to take the properties such as 
