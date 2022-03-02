@@ -1,17 +1,6 @@
 import-module ActiveDirectory
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
-while ($null -eq $domain.name){
-    if($cred = $host.ui.PromptForCredential('Need credentials', 'Please enter your user name and password.',
-    'PRHC01\', "SYSTEM\Administrator")){}else{exit}
-    $username = $cred.username
-    try{$password = $cred.GetNetworkCredential().password} catch{}
-
-    # Get current domain using logged-on user's credentials
-    $CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
-    $domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
-}
-
 Function DarkMode{
     $grey = '#484848' 
     $black = '#2b2a2a' 
@@ -27,6 +16,7 @@ Function DarkMode{
     $CopyNetNewUserBox.ForeColor = $white
     $CopyOverwriteGroupsBox.ForeColor = $white
     $CopyOverwritePropertiesBox.ForeColor = $white
+    $CopyOverwriteOUBox.ForeColor = $white
     $CopyDeleteFileBox.ForeColor = $white
     $CompareSearch.ForeColor = $white
     $CompareSearchBox.BackColor = $grey
@@ -61,6 +51,7 @@ Function LightMode{
     $CopyNetNewUserBox.ForeColor = $black
     $CopyOverwriteGroupsBox.ForeColor = $black
     $CopyOverwritePropertiesBox.ForeColor = $black
+    $CopyOverwriteOUBox.ForeColor = $black
     $CopyDeleteFileBox.ForeColor = $black
     $CompareSearch.ForeColor = $black
     $CompareSearchBox.BackColor = $white
@@ -238,80 +229,80 @@ function GenerateFile {
     #querry the users information from Active Directory
 
     try {
-        $User_Desc = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Description |
+        $User_Desc = Get-ADUser -Identity $DesiredUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     }
     try {
-        $User_Name = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Name |
+        $User_Name = Get-ADUser -Identity $DesiredUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     }
     try {
-        $User_Email = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties EmailAddress |
+        $User_Email = Get-ADUser -Identity $DesiredUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     }
     try {
-        $User_FullName = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties DisplayName |
+        $User_FullName = Get-ADUser -Identity $DesiredUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     }
     try {
-        $User_Department = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Department |
+        $User_Department = Get-ADUser -Identity $DesiredUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     }
     try {
-        $User_Company = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Company |
+        $User_Company = Get-ADUser -Identity $DesiredUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     }
     try {
-        $User_JobTitle = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Title |
+        $User_JobTitle = Get-ADUser -Identity $DesiredUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     }  try {
-        $User_Office = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties office |
+        $User_Office = Get-ADUser -Identity $DesiredUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     }  try {
-        $User_Phone = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties telephoneNumber |
+        $User_Phone = Get-ADUser -Identity $DesiredUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
    
     }  try {
-        $User_ManagerTemp = Get-ADUser -Credential $cred -Identity $DesiredUser -Properties Manager |
+        $User_ManagerTemp = Get-ADUser -Identity $DesiredUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     }  try {
-        $User_Manager = Get-ADUser -Credential $cred -Identity $User_ManagerTemp -Properties DisplayName |
+        $User_Manager = Get-ADUser -Identity $User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     }
      
-    $Groups = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $DesiredUser | Select-Object Name 
+    $Groups = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $DesiredUser | Select-Object Name 
 
     $assignToPostContent += "<div class='allInfo'>"
     if ($User_Name) { $assignToPostContent += "<div class = 'info'><div class='inLineText'><h3>Username:  </h3> <h2>" + $User_Name + "</h2></div>" }
@@ -377,7 +368,7 @@ function GenerateFile {
     Start-Process $env:USERPROFILE/AppData\Local\Temp\Show-User-Description.html
 
     #remove the file if box is checked 
-    if ($CopyDeleteFileBox.Checked = $true)
+    if ($CopyDeleteFileBox.Checked -eq $true)
     {
         Start-Sleep -s 5
         Remove-Item $env:USERPROFILE/AppData\Local\Temp\Show-User-Description.html -Force
@@ -573,67 +564,67 @@ function GenerateFileCompare {
     
     #querry the users information from Active Directory for the First User
     try {
-        $First_User_Desc = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Description |
+        $First_User_Desc = Get-ADUser -Identity $FirstUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     } try {
-        $First_User_Name = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Name |
+        $First_User_Name = Get-ADUser -Identity $FirstUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     } try {
-        $First_User_Email = Get-ADUser -Credential $cred -Identity $FirstUser -Properties EmailAddress |
+        $First_User_Email = Get-ADUser -Identity $FirstUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     } try {
-        $First_User_FullName = Get-ADUser -Credential $cred -Identity $FirstUser -Properties DisplayName |
+        $First_User_FullName = Get-ADUser -Identity $FirstUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     } try {
-        $First_User_Department = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Department |
+        $First_User_Department = Get-ADUser -Identity $FirstUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     } try {
-        $First_User_Company = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Company |
+        $First_User_Company = Get-ADUser -Identity $FirstUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     } try {
-        $First_User_JobTitle = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Title |
+        $First_User_JobTitle = Get-ADUser -Identity $FirstUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     } try {
-        $First_User_Office = Get-ADUser -Credential $cred -Identity $FirstUser -Properties office |
+        $First_User_Office = Get-ADUser -Identity $FirstUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     } try {
-        $First_User_Phone = Get-ADUser -Credential $cred -Identity $FirstUser -Properties telephoneNumber |
+        $First_User_Phone = Get-ADUser -Identity $FirstUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
 
     } try {
-        $First_User_ManagerTemp = Get-ADUser -Credential $cred -Identity $FirstUser -Properties Manager |
+        $First_User_ManagerTemp = Get-ADUser -Identity $FirstUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     } try {
-        $First_User_Manager = Get-ADUser -Credential $cred -Identity $First_User_ManagerTemp -Properties DisplayName |
+        $First_User_Manager = Get-ADUser -Identity $First_User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
@@ -646,77 +637,77 @@ function GenerateFileCompare {
     #$assignToPostContent += "<div class = 'secondUser'>"
     
     try {
-        $Second_User_Desc = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Description |
+        $Second_User_Desc = Get-ADUser -Identity $SecondUser -Properties Description |
         Select-Object -ExpandProperty Description
     }
     catch {
 
     } try {
 
-        $Second_User_Name = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Name |
+        $Second_User_Name = Get-ADUser -Identity $SecondUser -Properties Name |
         Select-Object -ExpandProperty Name
     }
     catch {
 
     } try {
 
-        $Second_User_Email = Get-ADUser -Credential $cred -Identity $SecondUser -Properties EmailAddress |
+        $Second_User_Email = Get-ADUser -Identity $SecondUser -Properties EmailAddress |
         Select-Object -ExpandProperty EmailAddress
     }
     catch {
 
     } try {
 
-        $Second_User_FullName = Get-ADUser -Credential $cred -Identity $SecondUser -Properties DisplayName |
+        $Second_User_FullName = Get-ADUser -Identity $SecondUser -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
 
     } try {
 
-        $Second_User_Department = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Department |
+        $Second_User_Department = Get-ADUser -Identity $SecondUser -Properties Department |
         Select-Object -ExpandProperty Department
     }
     catch {
 
     } try {
 
-        $Second_User_Company = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Company |
+        $Second_User_Company = Get-ADUser -Identity $SecondUser -Properties Company |
         Select-Object -ExpandProperty Company
     }
     catch {
 
     } try {
 
-        $Second_User_JobTitle = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Title |
+        $Second_User_JobTitle = Get-ADUser -Identity $SecondUser -Properties Title |
         Select-Object -ExpandProperty Title
     }
     catch {
 
     } try {
 
-        $Second_User_Office = Get-ADUser -Credential $cred -Identity $SecondUser -Properties office |
+        $Second_User_Office = Get-ADUser -Identity $SecondUser -Properties office |
         Select-Object -ExpandProperty office
     }
     catch {
 
     } try {
 
-        $Second_User_Phone = Get-ADUser -Credential $cred -Identity $SecondUser -Properties telephoneNumber |
+        $Second_User_Phone = Get-ADUser -Identity $SecondUser -Properties telephoneNumber |
         Select-Object -ExpandProperty telephoneNumber
     }
     catch {
 
     } try {
 
-        $Second_User_ManagerTemp = Get-ADUser -Credential $cred -Identity $SecondUser -Properties Manager |
+        $Second_User_ManagerTemp = Get-ADUser -Identity $SecondUser -Properties Manager |
         Select-Object -ExpandProperty Manager
     }
     catch {
 
     } try {
 
-        $Second_User_Manager = Get-ADUser -Credential $cred -Identity $Second_User_ManagerTemp -Properties DisplayName |
+        $Second_User_Manager = Get-ADUser -Identity $Second_User_ManagerTemp -Properties DisplayName |
         Select-Object -ExpandProperty DisplayName
     }
     catch {
@@ -781,12 +772,12 @@ function GenerateFileCompare {
     $SecondUserNotEqual = @()
     
     
-    $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $FirstUser | Select-Object Name
+    $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $FirstUser | Select-Object Name
     Foreach ($y IN $d) {
         $FirstUserList += $y.name
     }
 
-    $e = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $SecondUser | Select-Object Name
+    $e = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $SecondUser | Select-Object Name
     Foreach ($y IN $e) {
         $SecondUserList += $y.name
     }
@@ -922,7 +913,7 @@ function GenerateFileCompare {
     Start-Process $env:USERPROFILE/AppData\Local\Temp\Show-User-Description.html
 
     #remove file if box is checked
-    if ($DeleteBox.Checked -eq $true)
+    if ($CopyDeleteFileBox.Checked -eq $true)
     {
         Start-Sleep -s 10
         Remove-Item $env:USERPROFILE/AppData\Local\Temp\Show-User-Description.html -Force
@@ -954,12 +945,10 @@ Function Searching {
     #if group tree is selected
     if ($null -ne $selectedTree)
     {
-
         #if copying user 
         if ($CopyExistingUserBox.Checked -eq $true) {
             $oldUser = $SearchBox.Text
             $newUserUserName = $CopyUserNameBox.Text
-
             #net new user
             if ($CopyNetNewUserBox.Checked -eq $true) {
                 if (Test-ADUser($oldUser)) {
@@ -986,27 +975,27 @@ Function Searching {
                             $newUserDisplayName = $newUserLastName + ", " + $newUserFirstName
                             
                             #retrieve info from oldUser such as description, department, member of,  security... etc 
-                            $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
+                            $user = Get-ADUser $oldUser -Properties Department, Description, Manager, MemberOf, Office, Organization, ProfilePath, Title, Company
                             
                             #create new user with firstName, lastName, userName, email and everything else
                             
-                            New-ADUser -Credential $cred -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "Password1" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
+                            New-ADUser -Name $newUserUserName -UserPrincipalName $newUserUserName -DisplayName $newUserDisplayName -AccountPassword (ConvertTo-SecureString -AsPlainText "Password1" -force) -ChangePasswordAtLogon $true -GivenName $newUserFirstName -Surname $newUserLastName -EmailAddress $newUserEmail -Instance $user
 
                             #change new user OU location
 
-                            $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
+                            $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
 
                             $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                            $UserDN2 = (Get-ADUser -Credential $cred -Identity $newUserUserName).distinguishedName
+                            $UserDN2 = (Get-ADUser -Identity $newUserUserName).distinguishedName
 
-                            Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
+                            Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU 
 
                             #Copy Groups over
-                            $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $oldUser | Select-Object Name
+                            $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $oldUser | Select-Object Name
                             Foreach ($g IN $d) {
                                 if ($g.name -ne 'Domain Users') {
                                     try {
-                                        Add-ADGroupMember -Server $selectedTree -Credential $cred -Identity $g.name -Members $newUserUserName
+                                        Add-ADGroupMember -Server $selectedTree -Identity $g.name -Members $newUserUserName
                                     }
                                     catch {
                                         $counter += 1
@@ -1023,7 +1012,7 @@ Function Searching {
                             [System.Windows.MessageBox]::Show('Success')
                             while ($CheckArray.Length -ne ($d.Length - $counter)) { 
                                 try{
-                                $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $newUserUserName | Select-Object Name
+                                $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $newUserUserName | Select-Object Name
                                 }
                                 catch{
                                     
@@ -1041,253 +1030,92 @@ Function Searching {
                     [System.Windows.MessageBox]::Show('User copying from does not exist')
                 }
             }
-            # Check if overwrite member of groups box is checked 
-            Elseif ($CopyOverwriteGroupsBox.Checked -eq $true) {
-
-                #Check if overwrite member of groups box is checked and if overwrite properties is checked
-                if ($CopyOverwritePropertiesBox.Checked -eq $true) {
-                    #if old user exists
-                    if (Test-ADUser($oldUser)) {
-                        #if new user exists
-                        if (Test-ADUser($newUserUserName)) {
-                            $title    = 'Overwrite Member of groups and properties'
-                            $question = 'Are you sure you want to proceed?'
-
-                            $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
-                            $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
-                            $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
-
-                            $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-                            if ($decision -eq 0) {
-        
-                                #add functionality here ---------------
-                                $oldUser = $SearchBox.Text
-                            
-                                $existingUserUserName = $CopyUserNameBox.Text
-                            
-                                #remove old groups?
-                                Get-AdPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
-                            
-                                #retrieve info from oldUser such as description, department, member of,  security... etc 
-                                $user = Get-ADUser $oldUser -Credential $cred -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
-                            
-                                #modify eisting user information using $existingUserUserName
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
-                                try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
-                                
-
-                                
-            
-                                #Copy Groups over
-                                $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $oldUser | Select-Object Name
-                                Foreach ($g IN $d) {
-                                    if ($g.name -ne 'Domain Users') {
-                                        try {
-                                            Add-ADGroupMember -Server $selectedTree -Credential $cred -Identity $g.name -Members $existingUserUserName
-                                        }
-                                        catch {
-                                            $counter += 1
-                                        }
-                                    }
-                                }
-            
-                                #change new user OU location
-            
-                                $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
-            
-                                $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                                $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
-            
-                                Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
-            
-                            
-                                #At the end generate a file of a comparison of new user compared to old user
-                                #to show that new user is idenitical to old
-            
-        
-            
-                                $CheckArray = @()
-            
-                                [System.Windows.MessageBox]::Show('Success')
-                                while ($CheckArray.Length -ne ($d.Length - $counter)) { 
-
-                                    try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
-                                    Start-Sleep -Seconds 2
-                                }
-            
-            
-                                #Start-Sleep -s 17
-                                GenerateFileCompare $oldUser $newUserUserName
-                            }
-                        }
-                        #new user  does not exist
-                        else {
-                            [System.Windows.MessageBox]::Show('User copying to does not exist')
-                        }
-                    }
-                    #old user does not exist
-                    else {
-                        [System.Windows.MessageBox]::Show('User copying from does not exist')
-                    }
-                }
-                #If only overwrite box is checked, overwrite groups and not properties or OU
-                else {
-                    #if old user exists
-                    if (Test-ADUser($oldUser)) {
-                        #if new user exists
-                        if (Test-ADUser($newUserUserName)) {    
-                            $title    = 'Overwrite Member of groups'
-                            $question = 'Are you sure you want to proceed?'
-                            
-                            $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
-                            $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
-                            $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
-                            
-                            $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-                            if ($decision -eq 0) {
-                                
-                                #add functionality here ---------------
-                                $oldUser = $SearchBox.Text
-                            
-                                $existingUserUserName = $CopyUserNameBox.Text
-            
-                                #remove old groups
-                                Get-AdPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
-
-                                #Copy Groups over
-                                $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
-                                Foreach ($g IN $d) {
-                                    try {
-                                        Add-ADGroupMember -Server $selectedTree -Credential $cred -Identity $g.name -Members $newUserUserName
-                                    }
-                                    catch {
-                                        $counter += 1
-                                    }
-                                }
-            
-                                #At the end generate a file of a comparison of new user compared to old user
-                                #to show that new user is idenitical to old
-            
-            
-                                $CheckArray = @()
-            
-                                [System.Windows.MessageBox]::Show('Success')
-                                while (($CheckArray.Length - 1<#domain users#>) -ne ($d.Length - $counter<#inadequate access#>)) { 
-                                    $CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $newUserUserName | Select-Object Name
-                                    Start-Sleep -Seconds 2
-                                }
-            
-            
-            
-                                #Start-Sleep -s 17
-                                GenerateFileCompare $oldUser $newUserUserName
-                            }       
-                        }
-                        #if new user does not exist
-                        else {
-                            [System.Windows.MessageBox]::Show('User copying to does not exist')
-                        }
-                    }
-                    #if old user does not exists
-                    else {
-                        [System.Windows.MessageBox]::Show('User copying from does not exist')
-                    }
-                }
-        
-            }
-            # copy properties and append member of groups
-            Elseif ($CopyOverwritePropertiesBox.Checked -eq $true) {
+            #else if any of the overwrite boxes are checked
+            elseif (($CopyOverwriteGroupsBox.Checked -eq $true) -or ($CopyOverwritePropertiesBox.Checked -eq $true) -or ($CopyOverwriteOUBox.Checked -eq $true)) {
+                $oldUser = $SearchBox.Text
+                $existingUserUserName = $CopyUserNameBox.Text
                 #if old user exists
                 if (Test-ADUser($oldUser)) {
                     #if new user exists
                     if (Test-ADUser($newUserUserName)) {
-                        $title    = 'Copy Properties and append Member of groups'
-                        $question = 'Are you sure you want to proceed?'
+                        $title    = 'Copy feature to existing user'
+                        $question = 'Are you sure you want to proceed with this copy?'
 
                         $choices = New-Object Collections.ObjectModel.Collection[Management.Automation.Host.ChoiceDescription]
                         $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
                         $choices.Add((New-Object Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
 
                         $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-                        if ($decision -eq 0) {
-                            
-                            #add functionality here ---------------
-                            $oldUser = $SearchBox.Text
-                        
-                            $existingUserUserName = $CopyUserNameBox.Text
-                        
-                            #retrieve info from oldUser such as description, department, member of,  security... etc 
-                            $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
-                        
-                            #modify eisting user information using $existingUserUserName
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Description $user.Description} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Department $user.Department} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Manager $user.Manager} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Title $user.Title} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -office $user.office} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -organization $user.organization} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
-                            try{Set-ADUser -Credential $cred -Identity $existingUserUserName -Company $user.Company} Catch{}
+                        if ($decision -eq 0) { 
 
-                            
-        
-                            #dont remove old groups
-        
-                            #Copy Groups over
-                            $existingUserGroupList = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object -ExpandProperty Name
-                            $d = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $oldUser | Where-Object -Property Name -Ne -Value "Domain Users" | Select-Object Name
-                            $alreadyThereCounter = 0
-                            $counter = 0
-                            Foreach ($g IN $d) {
-                                if ($g.name -ne 'Domain Users') {
-                                    if ($existingUserGroupList -contains $g.name){$alreadyThereCounter+=1}
-                                    else{
-                                        try {
-                                            Add-ADGroupMember -Server $selectedTree -Credential $cred -Identity $g.name -Members $existingUserUserName
-                                        }
-                                        catch {
-                                            $counter += 1
-                                        }
+
+                            #if overwrite member of groups 
+                            if ($CopyOverwriteGroupsBox.Checked -eq $true) {
+                                #remove old groups of the new user
+                                Get-AdPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $existingUserUserName | Where-Object -Property Name -Ne -Value 'Domain Users' | Remove-AdGroupMember -Members $existingUserUserName -Confirm: $false
+                                #Copy Groups over
+                                $OldUserGroups = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $oldUser | Select-Object Name
+                                Foreach ($OldGroup IN $OldUserGroups) {
+                                    try {
+                                        Add-ADGroupMember -Server $selectedTree -Identity $OldGroup.name -Members $existingUserUserName
+                                    }
+                                    catch {
+                                        $counter += 1
                                     }
                                 }
-                            }
-                            #change new user OU location
-                            
-                            $UserDN = (Get-ADUser -Credential $cred -Identity $oldUser).distinguishedName
-                            
-                            $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
-                            $UserDN2 = (Get-ADUser -Credential $cred -Identity $ExistingUserUserName).distinguishedName
+                                #code below halts program until the changes of groups have been made as to not break the show results feature
+                                $CheckArray = @()
+                    
+                                
+                                while ($CheckArray.Length - 1<#domain users#> -ne ($OldUserGroups.Length - $counter<#inadequate access#>)) { 
 
-                            Move-ADObject  -Credential $cred -Identity $UserDN2  -TargetPath $TargetOU 
-                            #At the end generate a file of a comparison of new user compared to old user
-                            #to show that new user is idenitical to old
-        
-                            $CheckArray = @()
-                            [System.Windows.MessageBox]::Show('Success')
-                            while ((($CheckArray.Length)-($existingUserGroupList.Length-$alreadyThereCounter)) -ne ($d.Length - $counter)) {
-                                try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Credential $cred -Identity $existingUserUserName | Select-Object Name} catch{}
-                                Start-Sleep -Seconds 2
+                                    try{$CheckArray = Get-ADPrincipalGroupMembership -ResourceContextServer $selectedTree -Identity $existingUserUserName | Select-Object Name} catch{}
+                                    Start-Sleep -Seconds 2
+                                }
+
                             }
-                            #Start-Sleep -s 17
-                            GenerateFileCompare $oldUser $existingUserUserName
+                            
+                            #if overwrite properties
+                            if ($CopyOverwritePropertiesBox.Checked -eq $true) {
+                                #retrieve info from oldUser such as description, department, member of,  security... etc 
+                                $user = Get-ADUser $oldUser -Properties Department, Description, Manager, Title, office, organization, telephonenumber, Company
+                                #modify eisting user information using $existingUserUserName
+                                try{Set-ADUser -Identity $existingUserUserName -Description $user.Description} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -Department $user.Department} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -Manager $user.Manager} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -Title $user.Title} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -office $user.office} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -organization $user.organization} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -telephonenumber $user.telephonenumber} Catch{}
+                                try{Set-ADUser -Identity $existingUserUserName -Company $user.Company} Catch{}    
+
+                            }
+                            #if overwrite OU
+                            if ($CopyOverwriteOUBox.Checked -eq $true) {
+                                #change new user OU location
+                    
+                                $UserDN = (Get-ADUser -Identity $oldUser).distinguishedName
+                    
+                                $TargetOU = $UserDN.Substring($UserDN.IndexOf('OU='))
+                                $UserDN2 = (Get-ADUser -Identity $ExistingUserUserName).distinguishedName
+            
+                                Move-ADObject  -Identity $UserDN2  -TargetPath $TargetOU
+
+                            }
+                            #after finished generate compare file
+                            [System.Windows.MessageBox]::Show('Success')
+                            GenerateFileCompare $oldUser $newUserUserName
                         }
                     }
-                    #else new user does not exist throw error
+                    #new user  does not exist
                     else {
-                        [System.Windows.MessageBox]::Show('User copying from does not exist')
+                        [System.Windows.MessageBox]::Show('User copying to does not exist')
                     }
                 }
-                #else old  user does not exists throw error
+                #old user does not exist
                 else {
                     [System.Windows.MessageBox]::Show('User copying from does not exist')
                 }
-        
             }
             #default append groups to existing user, do not copy properties.
             else {
@@ -1346,17 +1174,16 @@ Function Searching {
                             GenerateFileCompare $oldUser $existingUserUserName
                         }
                     }
-                #else new user does not exist throw error
+                    #else new user does not exist throw error
+                    else {
+                        [System.Windows.MessageBox]::Show('User copying from does not exist')
+                    }
+                }
+                #else old  user does not exists throw error
                 else {
                     [System.Windows.MessageBox]::Show('User copying from does not exist')
                 }
             }
-            #else old  user does not exists throw error
-            else {
-                [System.Windows.MessageBox]::Show('User copying from does not exist')
-            }
-            }
-            
         }
         #basic compare person
         ElseIf ($CompareBox.Checked -eq $true) {
@@ -1370,7 +1197,8 @@ Function Searching {
             }
         }
         #basic absolute default just generate a file of the user's info
-        else {
+        else
+        {
             $User_Input = $SearchBox.Text
             #Write-Host $User_Input
             if (Test-ADUser($User_Input)) {
@@ -1379,8 +1207,7 @@ Function Searching {
             else {
                 [System.Windows.MessageBox]::Show('Invalid User...                   ')
             }
-        }
-     
+        } 
     }
     else{
         [System.Windows.MessageBox]::Show('Select a group tree to search')
@@ -1411,6 +1238,7 @@ Function NewExistingSearchBarCopy {
     $CopyNetNewUserBox.Visible = $true
     $CopyOverwriteGroupsBox.Visible = $true
     $CopyOverwritePropertiesBox.Visible = $true
+    $CopyOverwriteOUBox.Visible = $true
     #make copy features visible
     
     $CopyUserName.Visible = $true
@@ -1429,6 +1257,7 @@ Function RemoveExistingSearchBarCopy {
     $CopyUserNameBox.Visible = $false
     $CopyOverwriteGroupsBox.Visible = $false
     $CopyOverwritePropertiesBox.Visible = $false
+    $CopyOverwriteOUBox.Visible = $false
 
     #add back other checkbox for recovered functionality
     $CompareBox.Visible = $true
@@ -1475,23 +1304,42 @@ Function addNetNewUserBack {
 Function NetNewRemoveCopy {
     $CopyOverwriteGroupsBox.Visible = $false
     $CopyOverwritePropertiesBox.Visible = $false
+    $CopyOverwriteOUBox.Visible = $false
     $CopyOverwriteGroupsBox.Checked = $false
     $CopyOverwritePropertiesBox.Checked = $false
+    $CopyOverwriteOUBox.Checked = $false
     
 }
 
 Function NetNewAddCopy {
     $CopyOverwriteGroupsBox.Visible = $true
     $CopyOverwritePropertiesBox.Visible = $true
+    $CopyOverwriteOUBox.Visible = $true
 
     $CopyLastNameBox.Text = ''
     $CopyFirstNameBox.Text = ''
+}
+function Group1Checked{
+    $GroupTree2.Visible = $false
+    Set-Variable -Name "selectedTree" -Value "DC01.prhc.on.ca" -scope Global
+}
+function Group2Checked{
+    $GroupTree1.Visible = $false
+    Set-Variable -Name "selectedTree" -Value "DC02.prhc.on.ca" -scope Global
+}
+function Group1unChecked{
+    $GroupTree2.Visible = $true
+    Set-Variable -Name "selectedTree" -Value $null -scope Global
+}
+function Group2unChecked{
+    $GroupTree1.Visible = $true
+    Set-Variable -name "selectedTree" -value $null -scope Global
 }
 
 #create a windows gui form data
 #form container
 $form1 = New-Object System.Windows.Forms.Form
-$form1.ClientSize = "720,290"
+$form1.ClientSize = "720,330"
 $form1.StartPosition = "CenterScreen"
 $form1.Text = "Active Directory Extra Features"
 
@@ -1510,7 +1358,6 @@ $darkButtonBox.add_CheckedChanged({
         LightMode
     }
 })
-
 
 
 #label for search bar
@@ -1627,7 +1474,7 @@ $CopyOverwritePropertiesBox.location = New-Object System.Drawing.size(380, 235)
 $CopyOverwritePropertiesBox.size = New-Object System.Drawing.size(190, 35)
 $CopyOverwritePropertiesBox.Checked = $false
 $CopyOverwritePropertiesBox.Visible = $false
-$CopyOverwritePropertiesBox.text = "Overwrite user's properties and OU"
+$CopyOverwritePropertiesBox.text = "Overwrite user's properties"
 $CopyOverwritePropertiesBox.Font = 'Microsoft Sans Serif,10'
 
 $CopyOverwritePropertiesBox.Name = "CopyNewUserBox"
@@ -1639,23 +1486,35 @@ $CopyOverwritePropertiesBox.add_CheckedChanged({
             addNetNewUserBack
         }
     })
+#overwrite member of groups
+$CopyOverwriteOUBox = New-Object System.Windows.Forms.CheckBox
+$CopyOverwriteOUBox.location = New-Object System.Drawing.size(380, 270)
+$CopyOverwriteOUBox.size = New-Object System.Drawing.size(190, 35)
+$CopyOverwriteOUBox.Checked = $false
+$CopyOverwriteOUBox.Visible = $false
+$CopyOverwriteOUBox.text = "Overwrite user's OU"
+$CopyOverwriteOUBox.Font = 'Microsoft Sans Serif,10'
+
+$CopyOverwriteOUBox.Name = "CopyNewUserBox"
+$CopyOverwriteOUBox.add_CheckedChanged({
+        if ($CopyOverwriteOUBox.Checked -eq $true) {
+            removeNetNewUser
+        }
+        if ($CopyOverwriteOUBox.Checked -eq $false) {
+            addNetNewUserBack
+        }
+    })
+
 
 #delete file after doing process
 $CopyDeleteFileBox = New-Object System.Windows.Forms.CheckBox
 $CopyDeleteFileBox.location = New-Object System.Drawing.size(420, 60)
 $CopyDeleteFileBox.size = New-Object System.Drawing.size(190, 30)
-$CopyDeleteFileBox.Checked = $false
 $CopyDeleteFileBox.text = "delete temp file after..."
 $CopyDeleteFileBox.Font = 'Microsoft Sans Serif,9'
 $CopyDeleteFileBox.Name = "CopyDeleteFileBox"
-$CopyDeleteFileBox.add_CheckedChanged({
-    if ($CopyDeleteFileBox.Checked -eq $true) {
-        $DeleteBoxChecked = $true
-    }
-    if ($CopyDeleteFileBox.Checked -eq $false) {
-        $DeleteBoxChecked = $false
-    }
-})
+$CopyDeleteFileBox.Checked = $false
+
 
 #choose tree
 $GroupTree1 = New-Object System.Windows.Forms.CheckBox
@@ -1679,7 +1538,6 @@ $GroupTree1.add_CheckedChanged({
 $GroupTree2 = New-Object System.Windows.Forms.CheckBox
 $GroupTree2.location = New-Object System.Drawing.size(580, 45)
 $GroupTree2.size = New-Object System.Drawing.size(190, 30)
-$GroupTree2.Checked = $false
 $GroupTree2.text = "DC02.prhc.on.ca"
 $GroupTree2.Font = 'Microsoft Sans Serif,9'
 $GroupTree2.Name = "CopyDeleteFileBox"
@@ -1691,22 +1549,8 @@ $GroupTree2.add_CheckedChanged({
         Group2unChecked
     }
 })
-function Group1Checked{
-    $GroupTree2.Visible = $false
-    Set-Variable -Name "selectedTree" -Value "DC01.prhc.on.ca" -scope Global
-}
-function Group2Checked{
-    $GroupTree1.Visible = $false
-    Set-Variable -Name "selectedTree" -Value "DC02.prhc.on.ca" -scope Global
-}
-function Group1unChecked{
-    $GroupTree2.Visible = $true
-    Set-Variable -Name "selectedTree" -Value $null -scope Global
-}
-function Group2unChecked{
-    $GroupTree1.Visible = $true
-    Set-Variable -name "selectedTree" -value $null -scope Global
-}
+$GroupTree2.Checked = $true
+
 
 #label for search second bar
 $CompareSearch = New-Object System.Windows.Forms.Label
@@ -1799,9 +1643,9 @@ $toolTip1.SetToolTip($CopyOverwriteGroupsBox, "This will change the program func
 the default which is to append the groups")
 $toolTip1.SetToolTip($CopyOverwritePropertiesBox, "This will the change the program function to take the properties such as 
 Department, Description, Manager, Office, Organization, Title, and Company and put them onto the 
-user that is being copied to, overwriting the exiting properties on that account.
-This also moves the user to the OU location of the old user. 
+user that is being copied to, overwriting the exiting properties on that account. 
 This is different from the default which does not do anything with the properties.")
+$toolTip1.SetToolTip($CopyOverwriteOUBox, "This moves the user to the OU location of the old user.")
 $toolTip1.SetToolTip($CompareBox, "Checking this box will compare the 2 users entered and generate a html file that draws the comparisons between them.")
 $toolTip1.SetToolTip($SearchButton, "If no checkboxes are checked this form will search a single user and open their info in a html file.")
 $toolTip1.SetToolTip($SearchBox, "Enter only the username here.")
@@ -1811,6 +1655,9 @@ $toolTip1.SetToolTip($CopyDeleteFileBox, "If checked, program will delete temp H
 If not checked the file will not be deleted, but the next time the program is run it will overwrite the old file.")
 $toolTip1.SetToolTip($GroupTree1,"Group trees affect how the member of groups work and having the wrong one selected will the brick the program. Program is only successful if the HTML file is opened.")
 $toolTip1.SetToolTip($GroupTree2,"Group trees affect how the member of groups work and having the wrong one selected will the brick the program. Program is only successful if the HTML file is opened.")
+
+# This line sets dark mode as the default
+$darkButtonBox.Checked = $true
 
 
 $form1.Controls.Add($Search)
@@ -1838,10 +1685,12 @@ $form1.Controls.Add($CopyExistingUserBox)
 $form1.Controls.Add($CopyNetNewUserBox)
 $form1.Controls.Add($CopyOverwriteGroupsBox)
 $form1.Controls.Add($CopyOverwritePropertiesBox)
+$form1.Controls.Add($CopyOverwriteOUBox)
 $form1.Controls.Add($CopyDeleteFileBox)
 $form1.Controls.Add($darkButtonBox)
 $form1.Controls.Add($SearchButton)
 #display the form
 $form1.ShowDialog() | out-null
 [System.Windows.Forms.Application]::EnableVisualStyles()
+
 
