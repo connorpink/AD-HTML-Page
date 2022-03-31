@@ -1,4 +1,4 @@
-# Ad_HTML_Page
+# [AD_HTML_Page](https://github.com/connorpink/AD-HTML-Page)
 ## Active Directory HTML page.  
 This program was made for the IT department at PRHC hospital as a tool to provide easy access to processes that are not available in Active Directory and take a long time to comeplete manually.
 The program is written in powershell and converted into a executable file. The program requires administrator privileges and prompts the user to login when launched. Through this the program can run the commands under the credentials of whatever user is desired. EXE file can be recompiled using [Win-PS2EXE](https://github.com/MScholtes/Win-PS2EXE)
